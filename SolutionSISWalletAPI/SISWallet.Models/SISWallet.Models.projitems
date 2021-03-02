@@ -9,5 +9,8 @@
     <Import_RootNamespace>SISWallet.Models</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Agendamiento_cobros.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Ventas.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Response.cs" />
   </ItemGroup>
 </Project>
