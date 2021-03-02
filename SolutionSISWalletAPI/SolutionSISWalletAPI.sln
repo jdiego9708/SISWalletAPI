@@ -9,6 +9,7 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SISWallet.Models", "SISWall
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		SISWallet.Models\SISWallet.Models.projitems*{4bc63e73-3f22-4464-b164-3cba8a31c8d9}*SharedItemsImports = 5
 		SISWallet.Models\SISWallet.Models.projitems*{fe8eb483-410a-4a31-b6c4-fe50bab17204}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
