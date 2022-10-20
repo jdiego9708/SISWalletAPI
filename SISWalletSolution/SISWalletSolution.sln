@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32929.385
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SISWallet.API", "SISWallet.API\SISWallet.API.csproj", "{66E8D217-0111-4706-B8B2-9292F9FDEF95}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AccesoDatos", "AccesoDatos", "{5EDD8896-21CA-46D6-932C-66A4ED6553C5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Entidades", "Entidades", "{8A21F9EE-A6C3-42C0-8DB3-807642374F8F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Servicios", "Servicios", "{AF33FBFC-9891-4BF4-8440-91F4DAEA7BE0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentacion", "Presentacion", "{4C95F9A0-A356-4794-80E6-DB9A5B6D77EB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SISWallet.Servicios", "SISWallet.Servicios\SISWallet.Servicios.csproj", "{2700D8F1-6784-4AED-B11D-D2BE005C377C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SISWallet.Entidades", "SISWallet.Entidades\SISWallet.Entidades.csproj", "{6E125EF4-8A14-47AB-A0CF-FFF5F5AED99A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SISWallet.AccesoDatos", "SISWallet.AccesoDatos\SISWallet.AccesoDatos.csproj", "{7493C59C-EC28-4E27-98AC-F1115E7BE6C7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{66E8D217-0111-4706-B8B2-9292F9FDEF95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66E8D217-0111-4706-B8B2-9292F9FDEF95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66E8D217-0111-4706-B8B2-9292F9FDEF95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66E8D217-0111-4706-B8B2-9292F9FDEF95}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2700D8F1-6784-4AED-B11D-D2BE005C377C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2700D8F1-6784-4AED-B11D-D2BE005C377C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2700D8F1-6784-4AED-B11D-D2BE005C377C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2700D8F1-6784-4AED-B11D-D2BE005C377C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E125EF4-8A14-47AB-A0CF-FFF5F5AED99A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E125EF4-8A14-47AB-A0CF-FFF5F5AED99A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E125EF4-8A14-47AB-A0CF-FFF5F5AED99A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E125EF4-8A14-47AB-A0CF-FFF5F5AED99A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7493C59C-EC28-4E27-98AC-F1115E7BE6C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7493C59C-EC28-4E27-98AC-F1115E7BE6C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7493C59C-EC28-4E27-98AC-F1115E7BE6C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7493C59C-EC28-4E27-98AC-F1115E7BE6C7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{66E8D217-0111-4706-B8B2-9292F9FDEF95} = {4C95F9A0-A356-4794-80E6-DB9A5B6D77EB}
+		{2700D8F1-6784-4AED-B11D-D2BE005C377C} = {AF33FBFC-9891-4BF4-8440-91F4DAEA7BE0}
+		{6E125EF4-8A14-47AB-A0CF-FFF5F5AED99A} = {8A21F9EE-A6C3-42C0-8DB3-807642374F8F}
+		{7493C59C-EC28-4E27-98AC-F1115E7BE6C7} = {5EDD8896-21CA-46D6-932C-66A4ED6553C5}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D7A43C89-8BE1-431A-8537-0CFD739CE6F4}
+	EndGlobalSection
+EndGlobal
