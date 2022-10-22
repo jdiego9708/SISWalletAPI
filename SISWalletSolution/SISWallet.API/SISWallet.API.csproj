@@ -7,7 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SISWallet.AccesoDatos\SISWallet.AccesoDatos.csproj" />
+    <ProjectReference Include="..\SISWallet.Entidades\SISWallet.Entidades.csproj" />
+    <ProjectReference Include="..\SISWallet.Servicios\SISWallet.Servicios.csproj" />
   </ItemGroup>
 
 </Project>

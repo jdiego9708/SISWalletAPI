@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SISWallet.API", "SISWallet.API\SISWallet.API.csproj", "{66E8D217-0111-4706-B8B2-9292F9FDEF95}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SISWallet.API", "SISWallet.API\SISWallet.API.csproj", "{66E8D217-0111-4706-B8B2-9292F9FDEF95}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AccesoDatos", "AccesoDatos", "{5EDD8896-21CA-46D6-932C-66A4ED6553C5}"
 EndProject
@@ -13,11 +13,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Servicios", "Servicios", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentacion", "Presentacion", "{4C95F9A0-A356-4794-80E6-DB9A5B6D77EB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SISWallet.Servicios", "SISWallet.Servicios\SISWallet.Servicios.csproj", "{2700D8F1-6784-4AED-B11D-D2BE005C377C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SISWallet.Servicios", "SISWallet.Servicios\SISWallet.Servicios.csproj", "{2700D8F1-6784-4AED-B11D-D2BE005C377C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SISWallet.Entidades", "SISWallet.Entidades\SISWallet.Entidades.csproj", "{6E125EF4-8A14-47AB-A0CF-FFF5F5AED99A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SISWallet.Entidades", "SISWallet.Entidades\SISWallet.Entidades.csproj", "{6E125EF4-8A14-47AB-A0CF-FFF5F5AED99A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SISWallet.AccesoDatos", "SISWallet.AccesoDatos\SISWallet.AccesoDatos.csproj", "{7493C59C-EC28-4E27-98AC-F1115E7BE6C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SISWallet.AccesoDatos", "SISWallet.AccesoDatos\SISWallet.AccesoDatos.csproj", "{7493C59C-EC28-4E27-98AC-F1115E7BE6C7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{39A55B06-8595-4DFB-81D1-1940D51AC87D}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
