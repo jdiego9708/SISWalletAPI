@@ -21,7 +21,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\SISWallet.Entidades\SISWallet.Entidades.csproj" />
+	  <ProjectReference Include="..\..\..\SISWalletAPP\SISWalletAPPSolution\SISWallet.Entidades\SISWallet.Entidades.csproj" />
 	</ItemGroup>
 
 </Project>

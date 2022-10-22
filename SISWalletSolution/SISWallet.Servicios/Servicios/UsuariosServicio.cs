@@ -17,6 +17,7 @@ namespace SISWallet.Servicios.Servicios
         }
         #endregion
 
+        #region MÉTODOS
         public RespuestaServicioModel ProcesarLogin(LoginModel login)
         {
             RespuestaServicioModel respuesta = new();
@@ -41,5 +42,6 @@ namespace SISWallet.Servicios.Servicios
                 return respuesta;
             }
         }
+        #endregion
     }
 }

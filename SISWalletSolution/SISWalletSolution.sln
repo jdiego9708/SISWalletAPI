@@ -15,14 +15,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentacion", "Presentacio
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SISWallet.Servicios", "SISWallet.Servicios\SISWallet.Servicios.csproj", "{2700D8F1-6784-4AED-B11D-D2BE005C377C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SISWallet.Entidades", "SISWallet.Entidades\SISWallet.Entidades.csproj", "{6E125EF4-8A14-47AB-A0CF-FFF5F5AED99A}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SISWallet.AccesoDatos", "SISWallet.AccesoDatos\SISWallet.AccesoDatos.csproj", "{7493C59C-EC28-4E27-98AC-F1115E7BE6C7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{39A55B06-8595-4DFB-81D1-1940D51AC87D}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SISWallet.Entidades", "..\..\SISWalletAPP\SISWalletAPPSolution\SISWallet.Entidades\SISWallet.Entidades.csproj", "{E4477AF5-4F04-48AE-BEFB-944903ADE12F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,14 +38,14 @@ Global
 		{2700D8F1-6784-4AED-B11D-D2BE005C377C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2700D8F1-6784-4AED-B11D-D2BE005C377C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2700D8F1-6784-4AED-B11D-D2BE005C377C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6E125EF4-8A14-47AB-A0CF-FFF5F5AED99A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6E125EF4-8A14-47AB-A0CF-FFF5F5AED99A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6E125EF4-8A14-47AB-A0CF-FFF5F5AED99A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6E125EF4-8A14-47AB-A0CF-FFF5F5AED99A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7493C59C-EC28-4E27-98AC-F1115E7BE6C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7493C59C-EC28-4E27-98AC-F1115E7BE6C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7493C59C-EC28-4E27-98AC-F1115E7BE6C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7493C59C-EC28-4E27-98AC-F1115E7BE6C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4477AF5-4F04-48AE-BEFB-944903ADE12F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4477AF5-4F04-48AE-BEFB-944903ADE12F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4477AF5-4F04-48AE-BEFB-944903ADE12F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4477AF5-4F04-48AE-BEFB-944903ADE12F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,8 +53,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{66E8D217-0111-4706-B8B2-9292F9FDEF95} = {4C95F9A0-A356-4794-80E6-DB9A5B6D77EB}
 		{2700D8F1-6784-4AED-B11D-D2BE005C377C} = {AF33FBFC-9891-4BF4-8440-91F4DAEA7BE0}
-		{6E125EF4-8A14-47AB-A0CF-FFF5F5AED99A} = {8A21F9EE-A6C3-42C0-8DB3-807642374F8F}
 		{7493C59C-EC28-4E27-98AC-F1115E7BE6C7} = {5EDD8896-21CA-46D6-932C-66A4ED6553C5}
+		{E4477AF5-4F04-48AE-BEFB-944903ADE12F} = {8A21F9EE-A6C3-42C0-8DB3-807642374F8F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D7A43C89-8BE1-431A-8537-0CFD739CE6F4}
