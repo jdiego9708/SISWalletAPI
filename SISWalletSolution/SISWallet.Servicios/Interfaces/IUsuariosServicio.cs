@@ -6,5 +6,6 @@ namespace SISWallet.Servicios.Interfaces
     public interface IUsuariosServicio
     {
         RespuestaServicioModel ProcesarLogin(LoginModel login);
+        RespuestaServicioModel NuevoCliente(ClienteBindingModel cliente);
     }
 }

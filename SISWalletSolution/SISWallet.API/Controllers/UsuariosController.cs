@@ -8,7 +8,7 @@ using SISWallet.Servicios.Interfaces;
 
 namespace SISWallet.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/")]
     [ApiController]
     public class UsuariosController : ControllerBase
     {

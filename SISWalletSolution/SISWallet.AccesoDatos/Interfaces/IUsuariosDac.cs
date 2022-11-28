@@ -6,6 +6,7 @@ namespace SISWallet.AccesoDatos.Interfaces
 {
     public interface IUsuariosDac
     {
+        Task<string> InsertarUsuarioVenta(Usuarios_ventas usuarios);
         Task<string> InsertarUsuario(Usuarios usuario);
         Task<string> EditarUsuario(Usuarios usuario);
         Task<(DataTable dtUsuarios, string rpta)> BuscarUsuarios(string tipo_busqueda, string texto_busqueda);

@@ -490,6 +490,68 @@
         }
         #endregion
 
+        public Task<string> InsertarUsuarioVenta(Usuarios_ventas usuarios)
+        {
+            string rpta = "";
+
+            string consulta = "INSERT INTO Usuarios_ventas (Id_venta, Id_usuario) " +
+                "VALUES(@Id_venta, @Id_usuario) ";
+
+            SqlConnection SqlCon = new SqlConnection();
+            SqlCon.InfoMessage += new SqlInfoMessageEventHandler(SqlCon_InfoMessage);
+            SqlCon.FireInfoMessageEventOnUserErrors = true;
+            try
+            {
+                SqlCon.ConnectionString = this.IConexionDac.Cn();
+                SqlCon.Open();
+                SqlCommand SqlCmd = new()
+                {
+                    Connection = SqlCon,
+                    CommandText = consulta,
+                    CommandType = CommandType.Text
+                };
+
+                SqlParameter Id_venta = new()
+                {
+                    ParameterName = "@Id_venta",
+                    SqlDbType = SqlDbType.Int,
+                    Value = usuarios.Id_venta
+                };
+                SqlCmd.Parameters.Add(Id_venta);
+
+                SqlParameter Id_usuario = new()
+                {
+                    ParameterName = "@Id_usuario",
+                    SqlDbType = SqlDbType.Int,
+                    Value = usuarios.Id_usuario
+                };
+                SqlCmd.Parameters.Add(Id_usuario);
+
+                rpta = SqlCmd.ExecuteNonQuery() >= 1 ? "OK" : "NO SE INGRESÓ";
+                if (!rpta.Equals("OK"))
+                {
+                    if (this.Mensaje_respuesta != null)
+                    {
+                        rpta = this.Mensaje_respuesta;
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                rpta = ex.Message;
+            }
+            catch (Exception ex)
+            {
+                rpta = ex.Message;
+            }
+            finally
+            {
+                if (SqlCon.State == ConnectionState.Open)
+                    SqlCon.Close();
+            }
+            return Task.FromResult(rpta);
+        }
+
         public Task<(string rpta, LoginDataModel loginData)> Login(string usuario, string pass, string fecha)
         {
             string rpta = "OK";
@@ -597,6 +659,12 @@
                             loginData.Credenciales = credencial;
                             loginData.Turno = turno;
                             loginData.Cobros = cobros;
+
+                            loginData.CobroDefault = cobros[0];
+                            loginData.TipoProductoDefault = cobros[0].Tipo_producto;
+                            loginData.ZonaDefault = cobros[0].Zona;
+                            loginData.CiudadDefault = cobros[0].Zona.Ciudad;
+                            loginData.PaisDefault = cobros[0].Zona.Ciudad.Pais;
                         }
                         else
                         {
