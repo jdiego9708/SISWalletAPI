@@ -31,6 +31,12 @@ namespace SISWallet.Servicios.Servicios
 
                 DataTable dtAgendamientos = result.dtAgendamientos;
 
+                if (dtAgendamientos == null)
+                    throw new Exception("Error buscando los agendamientos");
+
+                if (dtAgendamientos.Rows.Count < 1)
+                    throw new Exception("Error buscando los agendamientos");
+
                 List<Agendamiento_cobros> agendamientos = (from DataRow row in dtAgendamientos.Rows
                                                            select new Agendamiento_cobros(row)).ToList();
 
@@ -92,6 +98,54 @@ namespace SISWallet.Servicios.Servicios
                 { 
                     respuesta.Correcto = true;
                     respuesta.Respuesta = JsonConvert.SerializeObject(cuota);
+                }
+                else
+                {
+                    respuesta.Correcto = true;
+                    respuesta.Respuesta = JsonConvert.SerializeObject(new
+                    {
+                        MensajeError = $"Error aplazando la cuota | {rpta}"
+                    });
+                }
+
+                return respuesta;
+            }
+            catch (Exception ex)
+            {
+                respuesta.Correcto = false;
+                respuesta.Respuesta = JsonConvert.SerializeObject(new
+                {
+                    MensajeError = $"Error aplazando la cuota | {ex.Message}"
+                });
+                return respuesta;
+            }
+        }
+        public RespuestaServicioModel SincronizarFilas(BusquedaBindingModel busqueda)
+        {
+            RespuestaServicioModel respuesta = new();
+            try
+            {
+                var (dtAgendamientos, rpta) = this.IAgendamiento_cobrosDac.BuscarAgendamiento("AGENDAMIENTOS CONTEO FILAS",
+                    busqueda.Textos_busqueda.ToArray()).Result;
+
+                if (dtAgendamientos == null)
+                    throw new Exception("Error obteniendo el conteo filas");
+
+                foreach(DataRow row in dtAgendamientos.Rows)
+                {
+                    int id_agendamiento = Convert.ToInt32(row["Id_agendamiento"]);
+                    int orden = Convert.ToInt32(row["Orden"]);
+
+                    rpta = this.IAgendamiento_cobrosDac.ActualizarOrden(id_agendamiento, orden).Result;
+
+                    if (!rpta.Equals("OK"))
+                        throw new Exception($"Error actualizando el orden de {id_agendamiento}");
+                }
+
+                if (rpta.Equals("OK"))
+                {
+                    respuesta.Correcto = true;
+                    respuesta.Respuesta = JsonConvert.SerializeObject(dtAgendamientos);
                 }
                 else
                 {

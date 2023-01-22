@@ -45,8 +45,6 @@
         #region METODO INSERTAR
         public Task<string> InsertarAgendamiento(Agendamiento_cobros agendamiento)
         {
-            int id_agendamiento = 0;
-            int contador = 0;
             string rpta = string.Empty;
 
             string consulta = "INSERT INTO Agendamiento_cobros (Id_venta, Id_turno, Orden_cobro, Fecha_cobro, Hora_cobro, " +
@@ -84,7 +82,6 @@
                     Value = agendamiento.Id_venta
                 };
                 SqlCmd.Parameters.Add(Id_venta);
-                contador += 1;
 
                 SqlParameter Id_turno = new()
                 {
@@ -93,7 +90,6 @@
                     Value = agendamiento.Id_turno
                 };
                 SqlCmd.Parameters.Add(Id_turno);
-                contador += 1;
 
                 SqlParameter Orden_cobro = new()
                 {
@@ -102,7 +98,6 @@
                     Value = agendamiento.Orden_cobro
                 };
                 SqlCmd.Parameters.Add(Orden_cobro);
-                contador += 1;
 
                 SqlParameter Fecha_cobro = new()
                 {
@@ -111,7 +106,6 @@
                     Value = agendamiento.Fecha_cobro
                 };
                 SqlCmd.Parameters.Add(Fecha_cobro);
-                contador += 1;
 
                 SqlParameter Hora_cobro = new()
                 {
@@ -120,7 +114,6 @@
                     Value = agendamiento.Hora_cobro
                 };
                 SqlCmd.Parameters.Add(Hora_cobro);
-                contador += 1;
 
                 SqlParameter Valor_cobro = new()
                 {
@@ -129,7 +122,6 @@
                     Value = agendamiento.Valor_cobro
                 };
                 SqlCmd.Parameters.Add(Valor_cobro);
-                contador += 1;
 
                 SqlParameter Valor_pagado = new()
                 {
@@ -138,7 +130,6 @@
                     Value = agendamiento.Valor_pagado
                 };
                 SqlCmd.Parameters.Add(Valor_pagado);
-                contador += 1;
 
                 SqlParameter Saldo_restante = new()
                 {
@@ -147,7 +138,6 @@
                     Value = agendamiento.Saldo_restante
                 };
                 SqlCmd.Parameters.Add(Saldo_restante);
-                contador += 1;
 
                 SqlParameter Tipo_cobro = new()
                 {
@@ -157,7 +147,6 @@
                     Value = agendamiento.Tipo_cobro.Trim().ToUpper()
                 };
                 SqlCmd.Parameters.Add(Tipo_cobro);
-                contador += 1;
 
                 SqlParameter Observaciones_cobro = new()
                 {
@@ -167,7 +156,6 @@
                     Value = agendamiento.Observaciones_cobro.Trim().ToUpper()
                 };
                 SqlCmd.Parameters.Add(Observaciones_cobro);
-                contador += 1;
 
                 SqlParameter Estado_cobro = new()
                 {
@@ -177,9 +165,7 @@
                     Value = agendamiento.Estado_cobro.Trim().ToUpper()
                 };
                 SqlCmd.Parameters.Add(Estado_cobro);
-                contador += 1;
 
-                
                 rpta = SqlCmd.ExecuteNonQuery() >= 1 ? "OK" : "NO SE INGRESÓ";
                 if (!rpta.Equals("OK"))
                 {
@@ -190,7 +176,7 @@
                 }
                 else
                 {
-                    id_agendamiento = Convert.ToInt32(SqlCmd.Parameters["@Id_agendamiento"].Value);
+                    agendamiento.Id_agendamiento = Convert.ToInt32(SqlCmd.Parameters["@Id_agendamiento"].Value);
                 }
             }
             catch (SqlException ex)
@@ -781,6 +767,67 @@
                 dtAgendamientos = null;
             }
             return Task.FromResult((dtAgendamientos, rpta));
+        }
+        #endregion
+
+        #region METODO ACTUALIZAR ORDEN
+        public Task<string> ActualizarOrden(int id_agendamiento, int orden)
+        {
+            string rpta = string.Empty;
+
+            SqlConnection SqlCon = new();
+            SqlCon.InfoMessage += new SqlInfoMessageEventHandler(SqlCon_InfoMessage);
+            SqlCon.FireInfoMessageEventOnUserErrors = true;
+            try
+            {
+                SqlCon.ConnectionString = this.IConexionDac.Cn();
+                SqlCon.Open();
+                SqlCommand SqlCmd = new()
+                {
+                    Connection = SqlCon,
+                    CommandText = "sp_Actualizar_orden",
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                SqlParameter Id_agendamiento = new()
+                {
+                    ParameterName = "@Id_agendamiento",
+                    SqlDbType = SqlDbType.Int,
+                    Value = id_agendamiento,
+                };
+                SqlCmd.Parameters.Add(Id_agendamiento);
+
+                SqlParameter Orden = new()
+                {
+                    ParameterName = "@Orden",
+                    SqlDbType = SqlDbType.Int,
+                    Value = orden
+                };
+                SqlCmd.Parameters.Add(Orden);
+                
+                rpta = SqlCmd.ExecuteNonQuery() >= 1 ? "OK" : "NO SE INGRESÓ";
+                if (!rpta.Equals("OK"))
+                {
+                    if (this.Mensaje_respuesta != null)
+                    {
+                        rpta = this.Mensaje_respuesta;
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                rpta = ex.Message;
+            }
+            catch (Exception ex)
+            {
+                rpta = ex.Message;
+            }
+            finally
+            {
+                if (SqlCon.State == ConnectionState.Open)
+                    SqlCon.Close();
+            }
+            return Task.FromResult(rpta);
         }
         #endregion
     }

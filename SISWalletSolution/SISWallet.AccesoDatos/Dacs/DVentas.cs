@@ -44,8 +44,6 @@
         #region METODO INSERTAR
         public Task<string> InsertarVentas(Ventas venta)
         {
-            int id_venta = 0;
-            int contador = 0;
             string rpta = string.Empty;
 
             string consulta = "INSERT INTO Ventas (Id_cobro, Id_tipo_producto, Id_cliente, Id_direccion, Id_turno, Fecha_venta, Hora_venta, " +
@@ -84,7 +82,6 @@
                     Value = venta.Id_cobro
                 };
                 SqlCmd.Parameters.Add(Id_cobro);
-                contador += 1;
 
                 SqlParameter Id_tipo_producto = new()
                 {
@@ -93,7 +90,6 @@
                     Value = venta.Id_tipo_producto
                 };
                 SqlCmd.Parameters.Add(Id_tipo_producto);
-                contador += 1;
 
                 SqlParameter Id_cliente = new()
                 {
@@ -102,7 +98,6 @@
                     Value = venta.Id_cliente
                 };
                 SqlCmd.Parameters.Add(Id_cliente);
-                contador += 1;
 
                 SqlParameter Id_direccion = new()
                 {
@@ -111,7 +106,6 @@
                     Value = venta.Id_direccion
                 };
                 SqlCmd.Parameters.Add(Id_direccion);
-                contador += 1;
 
                 SqlParameter Id_turno = new()
                 {
@@ -120,7 +114,6 @@
                     Value = venta.Id_turno
                 };
                 SqlCmd.Parameters.Add(Id_turno);
-                contador += 1;
 
                 SqlParameter Fecha_venta = new()
                 {
@@ -129,7 +122,6 @@
                     Value = venta.Fecha_venta,
                 };
                 SqlCmd.Parameters.Add(Fecha_venta);
-                contador += 1;
 
                 SqlParameter Hora_venta = new()
                 {
@@ -139,7 +131,6 @@
                     Value = venta.Hora_venta,
                 };
                 SqlCmd.Parameters.Add(Hora_venta);
-                contador += 1;
 
                 SqlParameter Valor_venta = new()
                 {
@@ -148,7 +139,6 @@
                     Value = venta.Valor_venta,
                 };
                 SqlCmd.Parameters.Add(Valor_venta);
-                contador += 1;
 
                 SqlParameter Interes_venta = new()
                 {
@@ -157,7 +147,6 @@
                     Value = venta.Interes_venta,
                 };
                 SqlCmd.Parameters.Add(Interes_venta);
-                contador += 1;
 
                 SqlParameter Total_venta = new()
                 {
@@ -166,7 +155,6 @@
                     Value = venta.Total_venta,
                 };
                 SqlCmd.Parameters.Add(Total_venta);
-                contador += 1;
 
                 SqlParameter Numero_cuotas = new()
                 {
@@ -175,7 +163,6 @@
                     Value = venta.Numero_cuotas,
                 };
                 SqlCmd.Parameters.Add(Numero_cuotas);
-                contador += 1;
 
                 SqlParameter Frecuencia_cobro = new()
                 {
@@ -185,7 +172,6 @@
                     Value = venta.Frecuencia_cobro.Trim()
                 };
                 SqlCmd.Parameters.Add(Frecuencia_cobro);
-                contador += 1;
 
                 SqlParameter Valor_cuota = new()
                 {
@@ -194,17 +180,15 @@
                     Value = venta.Valor_cuota,
                 };
                 SqlCmd.Parameters.Add(Valor_cuota);
-                contador += 1;
 
                 SqlParameter Estado_venta = new()
                 {
                     ParameterName = "@Estado_venta",
                     SqlDbType = SqlDbType.VarChar,
                     Size = 50,
-                    Value = venta.Estado_venta.Trim()
+                    Value = venta.Estado_venta ?? "ACTIVO"
                 };
                 SqlCmd.Parameters.Add(Estado_venta);
-                contador += 1;
 
                 SqlParameter Tipo_venta = new()
                 {
@@ -214,10 +198,7 @@
                     Value = venta.Tipo_venta.Trim()
                 };
                 SqlCmd.Parameters.Add(Tipo_venta);
-                contador += 1;
-                #endregion
-
-                
+                #endregion                
                 rpta = SqlCmd.ExecuteNonQuery() >= 1 ? "OK" : "NO SE INGRESÓ";
                 if (!rpta.Equals("OK"))
                 {
@@ -228,7 +209,7 @@
                 }
                 else
                 {
-                    id_venta = Convert.ToInt32(SqlCmd.Parameters["@Id_venta"].Value);
+                    venta.Id_venta = Convert.ToInt32(SqlCmd.Parameters["@Id_venta"].Value);
                 }
             }
             

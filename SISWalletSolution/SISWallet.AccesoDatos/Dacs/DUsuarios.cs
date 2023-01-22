@@ -48,8 +48,6 @@
         #region METODO INSERTAR
         public Task<string> InsertarUsuario(Usuarios usuario)
         {
-            int id_usuario = 0;
-            int contador = 0;
             string rpta = string.Empty;
 
             string consulta = "INSERT INTO Usuarios (Fecha_ingreso, Alias, Nombres, Apellidos, Identificacion, " +
@@ -88,7 +86,6 @@
                     Value = usuario.Fecha_ingreso,
                 };
                 SqlCmd.Parameters.Add(Fecha_ingreso);
-                contador += 1;
 
                 SqlParameter Alias = new()
                 {
@@ -98,7 +95,6 @@
                     Value = usuario.Alias.Trim().ToUpper(),
                 };
                 SqlCmd.Parameters.Add(Alias);
-                contador += 1;
 
                 SqlParameter Nombres = new()
                 {
@@ -108,7 +104,6 @@
                     Value = usuario.Nombres.Trim().ToUpper(),
                 };
                 SqlCmd.Parameters.Add(Nombres);
-                contador += 1;
 
                 SqlParameter Apellidos = new()
                 {
@@ -118,7 +113,6 @@
                     Value = usuario.Apellidos.Trim().ToUpper(),
                 };
                 SqlCmd.Parameters.Add(Apellidos);
-                contador += 1;
 
                 SqlParameter Identificacion = new()
                 {
@@ -128,7 +122,6 @@
                     Value = usuario.Identificacion.Trim()
                 };
                 SqlCmd.Parameters.Add(Identificacion);
-                contador += 1;
 
                 SqlParameter Celular = new()
                 {
@@ -138,37 +131,34 @@
                     Value = usuario.Celular.Trim().ToUpper(),
                 };
                 SqlCmd.Parameters.Add(Celular);
-                contador += 1;
 
                 SqlParameter Email = new()
                 {
                     ParameterName = "@Email",
                     SqlDbType = SqlDbType.VarChar,
                     Size = 50,
-                    Value = usuario.Email.Trim()
+                    Value = usuario.Email ?? "",
                 };
                 SqlCmd.Parameters.Add(Email);
-                contador += 1;
 
                 SqlParameter Tipo_usuario = new()
                 {
                     ParameterName = "@Tipo_usuario",
                     SqlDbType = SqlDbType.VarChar,
                     Size = 50,
-                    Value = usuario.Tipo_usuario.Trim().ToUpper()
+                    Value = usuario.Tipo_usuario ?? "CLIENTE"
                 };
                 SqlCmd.Parameters.Add(Tipo_usuario);
-                contador += 1;
 
                 SqlParameter Estado_usuario = new()
                 {
                     ParameterName = "@Estado_usuario",
                     SqlDbType = SqlDbType.VarChar,
                     Size = 50,
-                    Value = usuario.Estado_usuario.Trim().ToUpper()
+                    Value = usuario.Estado_usuario ?? "ACTIVO"
                 };
                 SqlCmd.Parameters.Add(Estado_usuario);
-                contador += 1;
+
                 #endregion
 
                 rpta = SqlCmd.ExecuteNonQuery() >= 1 ? "OK" : "NO SE INGRESÓ";
@@ -182,7 +172,7 @@
                 }
                 else
                 {
-                    id_usuario = Convert.ToInt32(SqlCmd.Parameters["@Id_usuario"].Value);
+                    usuario.Id_usuario = Convert.ToInt32(SqlCmd.Parameters["@Id_usuario"].Value);
                 }
             }
             catch (SqlException ex)
@@ -365,21 +355,6 @@
         {
             string rpta = "OK";
 
-            StringBuilder consulta = new();
-
-            consulta.Append("SELECT * FROM Usuarios us ");
-
-            if (tipo_busqueda.Equals("ID USUARIO"))
-            {
-                consulta.Append("WHERE us.Id_usuario = @Texto_busqueda ");
-            }
-            else if (tipo_busqueda.Equals("TIPO USUARIO"))
-            {
-                consulta.Append("WHERE us.Tipo_usuario = @Texto_busqueda ");
-            }
-
-            consulta.Append("ORDER BY us.Id_usuario DESC");
-
             DataTable DtResultado = new("Usuarios");
             SqlConnection SqlCon = new();
             SqlCon.InfoMessage += new SqlInfoMessageEventHandler(SqlCon_InfoMessage);
@@ -391,9 +366,18 @@
                 SqlCommand Sqlcmd = new()
                 {
                     Connection = SqlCon,
-                    CommandText = consulta.ToString(),
-                    CommandType = CommandType.Text
+                    CommandText = "sp_Usuarios_g",
+                    CommandType = CommandType.StoredProcedure
                 };
+
+                SqlParameter Tipo_busqueda = new()
+                {
+                    ParameterName = "@Tipo_busqueda",
+                    SqlDbType = SqlDbType.VarChar,
+                    Size = 50,
+                    Value = tipo_busqueda.Trim()
+                };
+                Sqlcmd.Parameters.Add(Tipo_busqueda);
 
                 SqlParameter Texto_busqueda = new()
                 {
@@ -551,7 +535,6 @@
             }
             return Task.FromResult(rpta);
         }
-
         public Task<(string rpta, LoginDataModel loginData)> Login(string usuario, string pass, string fecha)
         {
             string rpta = "OK";

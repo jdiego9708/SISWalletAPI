@@ -22,6 +22,42 @@ namespace SISWallet.API.Controllers
         }
 
         [HttpPost]
+        [Route("SincronizarFilas")]
+        public IActionResult SincronizarFilas(JObject busquedaJson)
+        {
+            try
+            {
+                logger.LogInformation("Inicio de SincronizarFilas");
+
+                BusquedaBindingModel busquedaModel = busquedaJson.ToObject<BusquedaBindingModel>();
+
+                if (busquedaModel == null)
+                {
+                    logger.LogInformation("Sin información de SincronizarFilas");
+                    throw new Exception("Sin información de SincronizarFilas");
+                }
+                else
+                {
+                    RespuestaServicioModel rpta = this.IAgendamientosServicio.SincronizarFilas(busquedaModel);
+                    if (rpta.Correcto)
+                    {
+                        logger.LogInformation($"SincronizarFilas correcta");
+                        return Ok(rpta.Respuesta);
+                    }
+                    else
+                    {
+                        return BadRequest(rpta.Respuesta);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("Error SincronizarFilas de agendamientos", ex);
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
         [Route("BuscarAgendamientos")]
         public IActionResult BuscarAgendamientos(JObject busquedaJson)
         {

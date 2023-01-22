@@ -58,5 +58,82 @@ namespace SISWallet.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost]
+        [Route("NuevoCliente")]
+        public IActionResult NuevoCliente(JObject clienteJson)
+        {
+            try
+            {
+                logger.LogInformation("Inicio de nuevo cliente");
+
+                //loginJson = this.IEncriptacionHelper.ProcessJObject(loginJson);
+
+                ClienteBindingModel clienteModel = clienteJson.ToObject<ClienteBindingModel>();
+
+                if (clienteModel == null)
+                {
+                    logger.LogInformation("Sin información de nuevo cliente");
+                    throw new Exception("Sin información de nuevo cliente");
+                }
+                else
+                {
+                    RespuestaServicioModel rpta = this.IUsuariosServicio.NuevoCliente(clienteModel);
+                    if (rpta.Correcto)
+                    {
+                        logger.LogInformation($"Nuevo cliente correcto Id usuario: {clienteModel.Usuario.Id_usuario}");
+                        return Ok(rpta.Respuesta);
+                    }
+                    else
+                    {
+                        return BadRequest(rpta.Respuesta);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("Error nuevo cliente", ex);
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("BuscarArchivos")]
+        public IActionResult BuscarArchivos(JObject busquedaJson)
+        {
+            try
+            {
+                logger.LogInformation("Inicio de buscar archivos");
+
+                //loginJson = this.IEncriptacionHelper.ProcessJObject(loginJson);
+
+                BusquedaBindingModel busquedaModel = busquedaJson.ToObject<BusquedaBindingModel>();
+
+                if (busquedaModel == null)
+                {
+                    logger.LogInformation("Sin información de buscar archivos");
+                    throw new Exception("Sin información de buscar archivos");
+                }
+                else
+                {
+                    RespuestaServicioModel rpta = this.IUsuariosServicio.BuscarArchivos(busquedaModel);
+                    if (rpta.Correcto)
+                    {
+                        logger.LogInformation($"Buscar archivos correcto");
+                        return Ok(rpta.Respuesta);
+                    }
+                    else
+                    {
+                        return BadRequest(rpta.Respuesta);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("Error buscar archivos", ex);
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 }

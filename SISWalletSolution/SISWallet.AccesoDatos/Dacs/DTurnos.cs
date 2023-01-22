@@ -522,7 +522,7 @@
         #endregion
 
         #region METODO BUSCAR TURNOS
-        public Task<(DataTable dt,string rpta)> BuscarTurnos(string tipo_busqueda, string[] textos_busqueda)
+        public Task<(DataTable dt, string rpta)> BuscarTurnos(string tipo_busqueda, string[] textos_busqueda)
         {
             string rpta = "OK";
 
@@ -636,6 +636,203 @@
                         CommandType = CommandType.Text
                     };
                 }
+
+                SqlDataAdapter SqlData = new(Sqlcmd);
+                SqlData.Fill(DtResultado);
+
+                if (DtResultado.Rows.Count < 1)
+                {
+                    DtResultado = null;
+                }
+            }
+            catch (SqlException ex)
+            {
+                rpta = ex.Message;
+                DtResultado = null;
+            }
+            catch (Exception ex)
+            {
+                rpta = ex.Message;
+                DtResultado = null;
+            }
+            finally
+            {
+                if (SqlCon.State == ConnectionState.Open)
+                    SqlCon.Close();
+            }
+            return Task.FromResult((DtResultado, rpta));
+        }
+        public Task<(DataTable dt, string rpta)> BuscarTurnos(string tipo_busqueda, string texto_busqueda)
+        {
+            string rpta = "OK";
+
+            DataTable DtResultado = new("Turnos");
+            SqlConnection SqlCon = new();
+            SqlCon.InfoMessage += new SqlInfoMessageEventHandler(SqlCon_InfoMessage);
+            SqlCon.FireInfoMessageEventOnUserErrors = true;
+            try
+            {
+                StringBuilder consulta = new();
+                SqlCon.ConnectionString = this.IConexionDac.Cn();
+                SqlCon.Open();
+                SqlCommand Sqlcmd = new()
+                {
+                    Connection = SqlCon,
+                    CommandText = "sp_Turnos_g",
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                SqlParameter Tipo_busqueda = new()
+                {
+                    ParameterName = "@Tipo_busqueda",
+                    SqlDbType = SqlDbType.VarChar,
+                    Value = tipo_busqueda
+                };
+                Sqlcmd.Parameters.Add(Tipo_busqueda);
+
+                SqlParameter Texto_busqueda = new()
+                {
+                    ParameterName = "@Texto_busqueda",
+                    SqlDbType = SqlDbType.VarChar,
+                    Value = texto_busqueda
+                };
+                Sqlcmd.Parameters.Add(Texto_busqueda);
+
+                SqlDataAdapter SqlData = new(Sqlcmd);
+                SqlData.Fill(DtResultado);
+
+                if (DtResultado.Rows.Count < 1)
+                {
+                    DtResultado = null;
+                }
+            }
+            catch (SqlException ex)
+            {
+                rpta = ex.Message;
+                DtResultado = null;
+            }
+            catch (Exception ex)
+            {
+                rpta = ex.Message;
+                DtResultado = null;
+            }
+            finally
+            {
+                if (SqlCon.State == ConnectionState.Open)
+                    SqlCon.Close();
+            }
+            return Task.FromResult((DtResultado, rpta));
+        }
+        #endregion
+
+        #region METODO SINCRONIZAR CLIENTES
+        public Task<(DataTable dt, string rpta)> SincronizarClientes(int id_cobro, int id_usuario, DateTime fecha)
+        {
+            string rpta = "OK";
+
+            DataTable DtResultado = new("Agendamientos");
+            SqlConnection SqlCon = new();
+            SqlCon.InfoMessage += new SqlInfoMessageEventHandler(SqlCon_InfoMessage);
+            SqlCon.FireInfoMessageEventOnUserErrors = true;
+            try
+            {
+                StringBuilder consulta = new();
+                SqlCon.ConnectionString = this.IConexionDac.Cn();
+                SqlCon.Open();
+                SqlCommand Sqlcmd = new()
+                {
+                    Connection = SqlCon,
+                    CommandText = "sp_Sincronizar_clientes",
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                SqlParameter Id_cobro = new()
+                {
+                    ParameterName = "@Id_cobro",
+                    SqlDbType = SqlDbType.Int,
+                    Value = id_cobro
+                };
+                Sqlcmd.Parameters.Add(Id_cobro);
+
+                SqlParameter Id_usuario = new()
+                {
+                    ParameterName = "@Id_usuario",
+                    SqlDbType = SqlDbType.Int,
+                    Value = id_usuario
+                };
+                Sqlcmd.Parameters.Add(Id_usuario);
+
+                SqlParameter Fecha = new()
+                {
+                    ParameterName = "@Fecha",
+                    SqlDbType = SqlDbType.Date,
+                    Value = fecha
+                };
+                Sqlcmd.Parameters.Add(Fecha);
+
+                SqlDataAdapter SqlData = new(Sqlcmd);
+                SqlData.Fill(DtResultado);
+
+                if (DtResultado.Rows.Count < 1)
+                {
+                    DtResultado = null;
+                }
+            }
+            catch (SqlException ex)
+            {
+                rpta = ex.Message;
+                DtResultado = null;
+            }
+            catch (Exception ex)
+            {
+                rpta = ex.Message;
+                DtResultado = null;
+            }
+            finally
+            {
+                if (SqlCon.State == ConnectionState.Open)
+                    SqlCon.Close();
+            }
+            return Task.FromResult((DtResultado, rpta));
+        }
+        #endregion
+
+        #region METODO ESTADÍSTICAS DIARIAS
+        public Task<(DataTable dt, string rpta)> EstadisticasDiarias(int id_turno, DateTime fecha)
+        {
+            string rpta = "OK";
+
+            DataTable DtResultado = new("EstadisticasDiariias");
+            SqlConnection SqlCon = new();
+            SqlCon.InfoMessage += new SqlInfoMessageEventHandler(SqlCon_InfoMessage);
+            SqlCon.FireInfoMessageEventOnUserErrors = true;
+            try
+            {
+                StringBuilder consulta = new();
+                SqlCon.ConnectionString = this.IConexionDac.Cn();
+                SqlCon.Open();
+                SqlCommand Sqlcmd = new()
+                {
+                    Connection = SqlCon,
+                    CommandText = "sp_Estadistica_cobradores_diarias",
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                SqlParameter Texto_busqueda = new()
+                {
+                    ParameterName = "@Texto_busqueda",
+                    SqlDbType = SqlDbType.VarChar,
+                    Value = id_turno.ToString(),
+                };
+                Sqlcmd.Parameters.Add(Texto_busqueda);
+
+                SqlParameter Fecha = new()
+                {
+                    ParameterName = "@Fecha",
+                    SqlDbType = SqlDbType.Date,
+                    Value = fecha
+                };
+                Sqlcmd.Parameters.Add(Fecha);
 
                 SqlDataAdapter SqlData = new(Sqlcmd);
                 SqlData.Fill(DtResultado);

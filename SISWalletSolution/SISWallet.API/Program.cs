@@ -1,6 +1,8 @@
 using SISWallet.AccesoDatos;
 using SISWallet.AccesoDatos.Dacs;
 using SISWallet.AccesoDatos.Interfaces;
+using SISWallet.Entidades.Helpers;
+using SISWallet.Entidades.Helpers.Interfaces;
 using SISWallet.Servicios.Interfaces;
 using SISWallet.Servicios.Servicios;
 using System.Reflection;
@@ -46,6 +48,13 @@ builder.Services.AddTransient<IConexionDac, ConexionDac>()
 builder.Services.AddTransient<IUsuariosServicio, UsuariosServicio>();
 builder.Services.AddTransient<IAgendamientosServicio, AgendamientosServicio>(); 
 builder.Services.AddTransient<IVentasServicio, VentasServicio>();
+builder.Services.AddTransient<IBlobStorageService, BlobStorageService>();
+builder.Services.AddTransient<IDireccion_clientesDac, DDireccion_clientes>();
+builder.Services.AddTransient<IAgendamiento_cobrosDac, DAgendamiento_cobros>();
+builder.Services.AddTransient<IRutas_archivosDac, DRutas_archivos>();
+builder.Services.AddTransient<ITurnosDac, DTurnos>();
+builder.Services.AddTransient<IUsuariosDac, DUsuarios>();
+builder.Services.AddTransient<IVentasDac, DVentas>();
 #endregion
 
 builder.Services.AddControllers();
