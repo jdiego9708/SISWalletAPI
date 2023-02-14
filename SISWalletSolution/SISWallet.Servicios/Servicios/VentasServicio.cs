@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
+using SISWallet.AccesoDatos;
 using SISWallet.AccesoDatos.Interfaces;
+using SISWallet.Entidades.Modelos;
 using SISWallet.Entidades.ModelosBindeo;
 using SISWallet.Entidades.ModelosBindeo.ModelosConfiguracion.ConfiguracionSISWallet;
 using SISWallet.Entidades.Models;
@@ -12,9 +14,12 @@ namespace SISWallet.Servicios.Servicios
     {
         #region CONSTRUCTOR
         public IVentasDac IVentasDac { get; set; }
-        public VentasServicio(IVentasDac IVentasDac)
+        public IRutas_archivosDac Rutas_archivosDac { get; set; }
+        public VentasServicio(IVentasDac IVentasDac,
+            IRutas_archivosDac Rutas_archivosDac)
         {
             this.IVentasDac = IVentasDac;
+            this.Rutas_archivosDac = Rutas_archivosDac;
         }
         #endregion
 
@@ -24,8 +29,7 @@ namespace SISWallet.Servicios.Servicios
             RespuestaServicioModel respuesta = new();
             try
             {
-                var result = this.IVentasDac.BuscarVentas(busqueda.Tipo_busqueda,
-                    busqueda.Texto_busqueda1).Result;
+                var result = this.IVentasDac.BuscarVentas(busqueda).Result;
 
                 string rpta = result.rpta;
 
@@ -34,8 +38,30 @@ namespace SISWallet.Servicios.Servicios
                 if (dtVentas == null)
                     throw new Exception($"Error obteniendo ventas | {rpta}");
 
-                List<Ventas> ventas = (from DataRow row in dtVentas.Rows
-                                       select new Ventas(row)).ToList();
+                List<Ventas> ventas = new();
+
+                foreach (DataRow row in dtVentas.Rows)
+                {
+                    Ventas venta = new(row);
+
+                    if (venta.ImagenesGuardadas == null)
+                        venta.ImagenesGuardadas = new();
+
+                    ventas.Add(venta);
+
+                    var resultImages = this.Rutas_archivosDac.BuscarRutas("ID USUARIO", venta.Id_cliente.ToString()).Result;
+
+                    if (resultImages.dtRutas == null)
+                        continue;
+
+                    if (resultImages.dtRutas.Rows.Count < 1)
+                        continue;
+
+                    var rutas = (from DataRow rowRuta in resultImages.dtRutas.Rows
+                                 select new Rutas_archivos(rowRuta)).ToList();
+
+                    venta.ImagenesGuardadas.AddRange(rutas);                   
+                }
 
                 respuesta.Correcto = true;
                 respuesta.Respuesta = JsonConvert.SerializeObject(ventas);

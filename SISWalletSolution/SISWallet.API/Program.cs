@@ -55,6 +55,10 @@ builder.Services.AddTransient<IRutas_archivosDac, DRutas_archivos>();
 builder.Services.AddTransient<ITurnosDac, DTurnos>();
 builder.Services.AddTransient<IUsuariosDac, DUsuarios>();
 builder.Services.AddTransient<IVentasDac, DVentas>();
+builder.Services.AddTransient<IGastosDac, DGastos>();
+builder.Services.AddTransient<IGastosServicio, GastosServicio>();
+builder.Services.AddTransient<ICobrosDac, DCobros>();
+builder.Services.AddTransient<ICobrosServicio, CobrosServicio>();
 #endregion
 
 builder.Services.AddControllers();

@@ -98,5 +98,43 @@ namespace SISWallet.API.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("BuscarTipoGastos")]
+        public IActionResult BuscarTipoGastos(JObject busquedaJson)
+        {
+            try
+            {
+                logger.LogInformation("Inicio de buscar tipo gastos");
+
+                //loginJson = this.IEncriptacionHelper.ProcessJObject(loginJson);
+
+                BusquedaBindingModel busquedaModel = busquedaJson.ToObject<BusquedaBindingModel>();
+
+                if (busquedaModel == null)
+                {
+                    logger.LogInformation("Sin información de buscar tipo gastos");
+                    throw new Exception("Sin información de buscar tipo gastos");
+                }
+                else
+                {
+                    RespuestaServicioModel rpta = this.IGastosServicio.BuscarTipoGastos(busquedaModel);
+                    if (rpta.Correcto)
+                    {
+                        logger.LogInformation($"Buscar tipo gastos correcto");
+                        return Ok(rpta.Respuesta);
+                    }
+                    else
+                    {
+                        return BadRequest(rpta.Respuesta);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("Error buscar tipo gastos", ex);
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 }

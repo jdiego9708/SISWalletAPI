@@ -52,7 +52,7 @@ namespace SISWallet.Servicios.Servicios
                             Stream stream = new MemoryStream(imagenByte);
 
                             BlobResponse response = this.BlobStorageService.SubirArchivoContainerBlobStorage(stream,
-                                $"{gasto.Id_gasto}Imagen{contador}", "imagenesusuario");
+                                $"{gasto.Id_gasto}Imagen{contador}.png", "imagenesusuario");
 
                             if (!response.IsSuccess)
                                 throw new Exception("Error guardando las imagenes en el blob");
@@ -100,7 +100,7 @@ namespace SISWallet.Servicios.Servicios
             RespuestaServicioModel respuesta = new();
             try
             {
-                var result = this.GastosDac.BuscarGastos(busqueda.Tipo_busqueda, busqueda.Texto_busqueda1).Result;
+                var result = this.GastosDac.BuscarGastos(busqueda).Result;
 
                 if (result.dtGastos == null)
                     throw new Exception("Error al buscar gastos");
@@ -108,11 +108,60 @@ namespace SISWallet.Servicios.Servicios
                 if (result.dtGastos.Rows.Count < 1)
                     throw new Exception("No se encontraron gastos");
 
-                List<Gastos> gastos = (from DataRow row in result.dtGastos.Rows
-                                              select new Gastos(row)).ToList();
+                List<Gastos> gastos = new();
+
+                foreach (DataRow row in result.dtGastos.Rows)
+                {
+                    Gastos gasto = new(row);
+
+                    var resultImages = this.Rutas_archivosDac.BuscarRutas("ID GASTO", gasto.Id_gasto.ToString()).Result;
+
+                    if (resultImages.dtRutas == null)
+                        throw new Exception("Error al buscar rutas");
+
+                    if (resultImages.dtRutas.Rows.Count < 1)
+                        throw new Exception("No se encontraron rutas");
+
+                    var rutas = (from DataRow rowRuta in resultImages.dtRutas.Rows
+                                           select new Rutas_archivos(rowRuta)).ToList();
+
+                    if (gasto.ImagenesGuardadas == null)
+                        gasto.ImagenesGuardadas = new();
+
+                    gasto.ImagenesGuardadas.AddRange(rutas);
+
+                    gastos.Add(gasto);
+                }
 
                 respuesta.Correcto = true;
                 respuesta.Respuesta = JsonConvert.SerializeObject(gastos);
+                return respuesta;
+            }
+            catch (Exception ex)
+            {
+                respuesta.Correcto = false;
+                respuesta.Respuesta = ex.Message;
+                return respuesta;
+            }
+        }
+        public RespuestaServicioModel BuscarTipoGastos(BusquedaBindingModel busqueda)
+        {
+            RespuestaServicioModel respuesta = new();
+            try
+            {
+                var result = this.GastosDac.BuscarTipoGastos(busqueda.Tipo_busqueda, busqueda.Texto_busqueda1).Result;
+
+                if (result.dtGastos == null)
+                    throw new Exception("Error al buscar tipo gastos");
+
+                if (result.dtGastos.Rows.Count < 1)
+                    throw new Exception("No se encontraron tipo gastos");
+
+                List<Tipo_gastos> tipos = (from DataRow row in result.dtGastos.Rows
+                                       select new Tipo_gastos(row)).ToList();
+
+                respuesta.Correcto = true;
+                respuesta.Respuesta = JsonConvert.SerializeObject(tipos);
                 return respuesta;
             }
             catch (Exception ex)

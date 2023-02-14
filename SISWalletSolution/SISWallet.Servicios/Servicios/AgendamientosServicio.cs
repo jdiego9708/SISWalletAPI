@@ -12,9 +12,12 @@ namespace SISWallet.Servicios.Servicios
     {
         #region CONSTRUCTOR
         public IAgendamiento_cobrosDac IAgendamiento_cobrosDac { get; set; }
-        public AgendamientosServicio(IAgendamiento_cobrosDac IAgendamiento_cobrosDac)
+        public IVentasDac IVentasDac { get; set; }
+        public AgendamientosServicio(IAgendamiento_cobrosDac IAgendamiento_cobrosDac,
+            IVentasDac IVentasDac)
         {
             this.IAgendamiento_cobrosDac = IAgendamiento_cobrosDac;
+            this.IVentasDac = IVentasDac;
         }
         #endregion
 
@@ -61,6 +64,19 @@ namespace SISWallet.Servicios.Servicios
 
                 if (rpta.Equals("OK"))
                 {
+                    if (cuota.Saldo_restante <= 0)
+                    {
+                        rpta = this.IVentasDac.CambiarEstadoVenta(cuota.Id_venta, "TERMINADO").Result;
+                        if (!rpta.Equals("OK")) 
+                        {
+                            respuesta.Correcto = true;
+                            respuesta.Respuesta = JsonConvert.SerializeObject(new
+                            {
+                                MensajeError = $"Error pagando la cuota en el momento de cambiar estado la venta| {rpta}"
+                            });
+                        }
+                    }
+
                     respuesta.Correcto = true;
                     respuesta.Respuesta = JsonConvert.SerializeObject(cuota);
                 }

@@ -1,6 +1,7 @@
 ﻿namespace SISWallet.AccesoDatos
 {
     using SISWallet.AccesoDatos.Interfaces;
+    using SISWallet.Entidades.ModelosBindeo;
     using SISWallet.Entidades.Models;
     using System;
     using System.Data;
@@ -581,42 +582,9 @@
         #endregion
 
         #region METODO BUSCAR VENTAS
-        public Task<(DataTable dtVentas, string rpta)> BuscarVentas(string tipo_busqueda, string texto_busqueda)
+        public Task<(DataTable dtVentas, string rpta)> BuscarVentas(BusquedaBindingModel busqueda)
         {
             string rpta = "OK";
-
-            StringBuilder consulta = new();
-
-            consulta.Append("SELECT * FROM Ventas ve " +
-                "INNER JOIN Cobros cb ON ve.Id_cobro = cb.Id_cobro " +
-                "INNER JOIN Turnos tu ON ve.Id_turno = tu.Id_turno " +
-                "INNER JOIN Tipo_productos tppr ON ve.Id_tipo_producto = tppr.Id_tipo_producto " +
-                "INNER JOIN Usuarios us ON ve.Id_cliente = us.Id_usuario " +
-                "INNER JOIN Direccion_clientes dcl ON ve.Id_direccion = dcl.Id_direccion ");
-
-            if (tipo_busqueda.Equals("ID VENTA"))
-            {
-                consulta.Append("WHERE ve.Id_venta = @Texto_busqueda ");
-            }
-            else if (tipo_busqueda.Equals("ID CLIENTE"))
-            {
-                consulta.Append("WHERE ve.Id_cliente = @Texto_busqueda ");
-            }
-            else if (tipo_busqueda.Equals("ID TURNO"))
-            {
-                consulta.Append("WHERE ve.Id_turno = @Texto_busqueda ");
-            }
-            else if (tipo_busqueda.Equals("ID COBRO"))
-            {
-                consulta.Append("WHERE ve.Id_cobro = @Texto_busqueda ");
-            }
-            else if (tipo_busqueda.Equals("ID COBRO ACTIVO"))
-            {
-                consulta.Append("WHERE ve.Id_cobro = @Texto_busqueda " +
-                    "AND ve.Estado_venta = 'ACTIVO' ");
-            }
-
-            consulta.Append("ORDER BY ve.Id_venta DESC");
 
             DataTable DtResultado = new("Ventas");
             SqlConnection SqlCon = new();
@@ -629,18 +597,36 @@
                 SqlCommand Sqlcmd = new()
                 {
                     Connection = SqlCon,
-                    CommandText = consulta.ToString(),
-                    CommandType = CommandType.Text
+                    CommandText = "sp_Ventas_g",
+                    CommandType = CommandType.StoredProcedure
                 };
 
-                SqlParameter Texto_busqueda = new()
+                SqlParameter Tipo_busqueda = new()
                 {
-                    ParameterName = "@Texto_busqueda",
+                    ParameterName = "@Tipo_busqueda",
                     SqlDbType = SqlDbType.VarChar,
                     Size = 50,
-                    Value = texto_busqueda.Trim()
+                    Value = busqueda.Tipo_busqueda.Trim()
                 };
-                Sqlcmd.Parameters.Add(Texto_busqueda);
+                Sqlcmd.Parameters.Add(Tipo_busqueda);
+
+                SqlParameter Texto_busqueda1 = new()
+                {
+                    ParameterName = "@Texto_busqueda1",
+                    SqlDbType = SqlDbType.VarChar,
+                    Size = 50,
+                    Value = busqueda.Texto_busqueda1.Trim()
+                };
+                Sqlcmd.Parameters.Add(Texto_busqueda1);
+
+                SqlParameter Texto_busqueda2 = new()
+                {
+                    ParameterName = "@Texto_busqueda2",
+                    SqlDbType = SqlDbType.VarChar,
+                    Size = 50,
+                    Value = busqueda.Texto_busqueda2.Trim()
+                };
+                Sqlcmd.Parameters.Add(Texto_busqueda2);
 
                 SqlDataAdapter SqlData = new(Sqlcmd);
                 SqlData.Fill(DtResultado);

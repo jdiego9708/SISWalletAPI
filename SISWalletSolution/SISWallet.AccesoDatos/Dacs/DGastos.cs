@@ -6,6 +6,7 @@
     using System.Data;
     using System.Data.SqlClient;
     using System.Threading.Tasks;
+    using SISWallet.Entidades.ModelosBindeo;
 
     public class DGastos : IGastosDac
     {
@@ -57,14 +58,12 @@
             try
             {
                 SqlCon.ConnectionString = this.IConexionDac.Cn();
-                SqlCon.OpenAsync();
-                SqlTransaction tran = SqlCon.BeginTransaction();
+                SqlCon.Open();
                 SqlCommand SqlCmd = new()
                 {
                     Connection = SqlCon,
                     CommandText = consulta,
                     CommandType = CommandType.Text,
-                    Transaction = tran,
                 };
 
                 SqlParameter Id_gasto = new()
@@ -145,7 +144,6 @@
                 rpta = SqlCmd.ExecuteNonQuery() >= 1 ? "OK" : "NO SE INGRESÓ";
                 if (!rpta.Equals("OK"))
                 {
-                    tran.Rollback();
                     if (this.Mensaje_respuesta != null)
                     {
                         rpta = this.Mensaje_respuesta;
@@ -153,10 +151,8 @@
                 }
                 else
                 {
-                    tran.Commit();
                     gasto.Id_gasto = Convert.ToInt32(SqlCmd.Parameters["@Id_gasto"].Value);
                 }
-                tran.Dispose();
             }
             catch (SqlException ex)
             {
@@ -176,7 +172,7 @@
         #endregion
 
         #region METODO BUSCAR GASTOS
-        public Task<(DataTable dtGastos, string rpta)> BuscarGastos(string tipo_busqueda, string texto_busqueda)
+        public Task<(DataTable dtGastos, string rpta)> BuscarGastos(BusquedaBindingModel busqueda)
         {
             string rpta = "OK";
 
@@ -192,6 +188,73 @@
                 {
                     Connection = SqlCon,
                     CommandText = "sp_Gastos_g",
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                SqlParameter Tipo_busqueda = new()
+                {
+                    ParameterName = "@Tipo_busqueda",
+                    SqlDbType = SqlDbType.VarChar,
+                    Size = 50,
+                    Value = busqueda.Tipo_busqueda.Trim()
+                };
+                Sqlcmd.Parameters.Add(Tipo_busqueda);
+
+                SqlParameter Texto_busqueda1 = new()
+                {
+                    ParameterName = "@Texto_busqueda1",
+                    SqlDbType = SqlDbType.VarChar,
+                    Size = 50,
+                    Value = busqueda.Texto_busqueda1.Trim()
+                };
+                Sqlcmd.Parameters.Add(Texto_busqueda1);
+
+                SqlParameter Texto_busqueda2 = new()
+                {
+                    ParameterName = "@Texto_busqueda2",
+                    SqlDbType = SqlDbType.VarChar,
+                    Size = 50,
+                    Value = busqueda.Texto_busqueda2.Trim()
+                };
+                Sqlcmd.Parameters.Add(Texto_busqueda2);
+
+                SqlDataAdapter SqlData = new(Sqlcmd);
+                SqlData.Fill(DtResultado);
+
+                if (DtResultado.Rows.Count < 1)
+                    DtResultado = null;               
+            }
+            catch (SqlException ex)
+            {
+                rpta = ex.Message;
+                DtResultado = null;
+            }
+            catch (Exception ex)
+            {
+                rpta = ex.Message;
+                DtResultado = null;
+            }
+            return Task.FromResult((DtResultado, rpta));
+        }
+        #endregion
+
+        #region METODO BUSCAR TIPO GASTOS
+        public Task<(DataTable dtGastos, string rpta)> BuscarTipoGastos(string tipo_busqueda, string texto_busqueda)
+        {
+            string rpta = "OK";
+
+            DataTable DtResultado = new("TipoGastos");
+            SqlConnection SqlCon = new();
+            SqlCon.InfoMessage += new SqlInfoMessageEventHandler(SqlCon_InfoMessage);
+            SqlCon.FireInfoMessageEventOnUserErrors = true;
+            try
+            {
+                SqlCon.ConnectionString = this.IConexionDac.Cn();
+                SqlCon.Open();
+                SqlCommand Sqlcmd = new()
+                {
+                    Connection = SqlCon,
+                    CommandText = "sp_Tipo_gastos_g",
                     CommandType = CommandType.StoredProcedure
                 };
 
@@ -217,7 +280,7 @@
                 SqlData.Fill(DtResultado);
 
                 if (DtResultado.Rows.Count < 1)
-                    DtResultado = null;               
+                    DtResultado = null;
             }
             catch (SqlException ex)
             {

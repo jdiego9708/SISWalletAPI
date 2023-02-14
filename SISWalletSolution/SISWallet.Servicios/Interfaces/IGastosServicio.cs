@@ -8,5 +8,6 @@ namespace SISWallet.Servicios.Interfaces
     {
         RespuestaServicioModel InsertarGasto(Gastos gasto);
         RespuestaServicioModel BuscarGastos(BusquedaBindingModel busqueda);
+        RespuestaServicioModel BuscarTipoGastos(BusquedaBindingModel busqueda);
     }
 }

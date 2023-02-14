@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using SISWallet.Entidades.Modelos;
 using SISWallet.Entidades.ModelosBindeo;
 using SISWallet.Entidades.ModelosBindeo.ModelosConfiguracion.ConfiguracionSISWallet;
 using SISWallet.Servicios.Interfaces;
@@ -135,5 +136,42 @@ namespace SISWallet.API.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("InsertarArchivos")]
+        public IActionResult InsertarArchivos(JArray busquedaJson)
+        {
+            try
+            {
+                logger.LogInformation("Inicio de insertar archivos");
+
+                //loginJson = this.IEncriptacionHelper.ProcessJObject(loginJson);
+
+                List<Rutas_archivos> rutas = busquedaJson.ToObject<List<Rutas_archivos>>();
+
+                if (rutas == null)
+                {
+                    logger.LogInformation("Sin información de insertar archivos");
+                    throw new Exception("Sin información de insertar archivos");
+                }
+                else
+                {
+                    RespuestaServicioModel rpta = this.IUsuariosServicio.InsertarArchivos(rutas);
+                    if (rpta.Correcto)
+                    {
+                        logger.LogInformation($"Insertar archivos correcto");
+                        return Ok(rpta.Respuesta);
+                    }
+                    else
+                    {
+                        return BadRequest(rpta.Respuesta);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("Error insertar archivos", ex);
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
