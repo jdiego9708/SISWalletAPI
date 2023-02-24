@@ -120,8 +120,11 @@ namespace SISWallet.Servicios.Servicios
                     throw new Exception("No se encontraron las reglas del usuario");
 
                 //Buscar turno
-                var resultTurno = this.ITurnosDac.BuscarTurnos("ULTIMO TURNO ID COBRO",
-                        cobroDefault.Id_cobro.ToString()).Result;
+                var resultTurno = this.ITurnosDac.BuscarTurnos(new BusquedaBindingModel()
+                {
+                    Tipo_busqueda = "ULTIMO TURNO ID COBRO",
+                    Texto_busqueda1 = cobroDefault.Id_cobro.ToString()
+                }).Result;
 
                 DateTime fechaLogin = ConvertValueHelper.ConvertirFecha(login.Fecha);
                 TimeSpan horaLogin = ConvertValueHelper.ConvertirHora(login.Hora);
@@ -433,6 +436,40 @@ namespace SISWallet.Servicios.Servicios
 
                 respuesta.Correcto = true;
                 respuesta.Respuesta = JsonConvert.SerializeObject(rutas);
+                return respuesta;
+            }
+            catch (Exception ex)
+            {
+                respuesta.Correcto = false;
+                respuesta.Respuesta = ex.Message;
+                return respuesta;
+            }
+        }
+        public RespuestaServicioModel SincronizarClientes(BusquedaBindingModel busqueda)
+        {
+
+            RespuestaServicioModel respuesta = new();
+            try
+            {
+                if (!int.TryParse(busqueda.Texto_busqueda1, out int id_cobro))
+                    throw new Exception("El Texto_busqueda1 debe ser el Id_cobro");
+
+                if (!DateTime.TryParse(busqueda.Texto_busqueda2, out DateTime fecha_login))
+                    throw new Exception("El Texto_busqueda2 debe ser el fecha_login");
+
+                var resultSyncClientes = this.ITurnosDac.SincronizarClientes(id_cobro, 0, fecha_login).Result;
+
+                if (resultSyncClientes.dt == null)
+                    throw new Exception("No se pudieron sincronizar los clientes");
+
+                if (resultSyncClientes.dt.Rows.Count < 1)
+                    throw new Exception("No se pudieron sincronizar los clientes");
+
+                List<Agendamiento_cobros> agendamiento = (from DataRow row in resultSyncClientes.dt.Rows
+                                                          select new Agendamiento_cobros(row)).ToList();
+
+                respuesta.Correcto = true;
+                respuesta.Respuesta = JsonConvert.SerializeObject(agendamiento);
                 return respuesta;
             }
             catch (Exception ex)

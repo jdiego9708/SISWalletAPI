@@ -164,5 +164,41 @@ namespace SISWallet.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost]
+        [Route("ActualizarOrdenAgendamiento")]
+        public IActionResult ActualizarOrdenAgendamiento(JArray agJson)
+        {
+            try
+            {
+                logger.LogInformation("Inicio de actualizar orden");
+
+                List<BusquedaBindingModel> busquedas = agJson.ToObject<List<BusquedaBindingModel>>();
+
+                if (busquedas == null)
+                {
+                    logger.LogInformation("Sin información de busquedas");
+                    throw new Exception("Sin información de busquedas");
+                }
+                else
+                {
+                    RespuestaServicioModel rpta = this.IAgendamientosServicio.ActualizarOrdenAgendamiento(busquedas);
+                    if (rpta.Correcto)
+                    {
+                        logger.LogInformation($"Busqueda correcta orden");
+                        return Ok(rpta.Respuesta);
+                    }
+                    else
+                    {
+                        return BadRequest(rpta.Respuesta);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("Error en actualizar orden", ex);
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

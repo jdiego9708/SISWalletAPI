@@ -173,5 +173,43 @@ namespace SISWallet.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost]
+        [Route("SincronizarClientes")]
+        public IActionResult SincronizarClientes(JObject busquedaJson)
+        {
+            try
+            {
+                logger.LogInformation("Inicio de SincronizarClientes");
+
+                //loginJson = this.IEncriptacionHelper.ProcessJObject(loginJson);
+
+                BusquedaBindingModel busquedaModel = busquedaJson.ToObject<BusquedaBindingModel>();
+
+                if (busquedaModel == null)
+                {
+                    logger.LogInformation("Sin información de SincronizarClientes");
+                    throw new Exception("Sin información de SincronizarClientes");
+                }
+                else
+                {
+                    RespuestaServicioModel rpta = this.IUsuariosServicio.SincronizarClientes(busquedaModel);
+                    if (rpta.Correcto)
+                    {
+                        logger.LogInformation($"SincronizarClientes correcto");
+                        return Ok(rpta.Respuesta);
+                    }
+                    else
+                    {
+                        return BadRequest(rpta.Respuesta);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("Error SincronizarClientes", ex);
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

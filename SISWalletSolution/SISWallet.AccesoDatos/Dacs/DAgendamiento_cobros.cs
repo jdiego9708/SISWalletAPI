@@ -153,7 +153,7 @@
                     ParameterName = "@Observaciones_cobro",
                     SqlDbType = SqlDbType.VarChar,
                     Size = 150,
-                    Value = agendamiento.Observaciones_cobro.Trim().ToUpper()
+                    Value = agendamiento.Observaciones_cobro == null ? string.Empty : agendamiento.Observaciones_cobro.Trim().ToUpper()
                 };
                 SqlCmd.Parameters.Add(Observaciones_cobro);
 

@@ -6,6 +6,7 @@ namespace SISWallet.Servicios.Interfaces
 {
     public interface IUsuariosServicio
     {
+        RespuestaServicioModel SincronizarClientes(BusquedaBindingModel busqueda);
         RespuestaServicioModel InsertarArchivos(List<Rutas_archivos> rutas);
         RespuestaServicioModel BuscarArchivos(BusquedaBindingModel busqueda);
         RespuestaServicioModel ProcesarLogin(LoginModel login);

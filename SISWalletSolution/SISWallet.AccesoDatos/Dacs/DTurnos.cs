@@ -1,6 +1,7 @@
 ﻿namespace SISWallet.AccesoDatos
 {
     using SISWallet.AccesoDatos.Interfaces;
+    using SISWallet.Entidades.ModelosBindeo;
     using SISWallet.Entidades.Models;
     using System;
     using System.Collections.Generic;
@@ -522,147 +523,7 @@
         #endregion
 
         #region METODO BUSCAR TURNOS
-        public Task<(DataTable dt, string rpta)> BuscarTurnos(string tipo_busqueda, string[] textos_busqueda)
-        {
-            string rpta = "OK";
-
-            DataTable DtResultado = new("Turnos");
-            SqlConnection SqlCon = new();
-            SqlCon.InfoMessage += new SqlInfoMessageEventHandler(SqlCon_InfoMessage);
-            SqlCon.FireInfoMessageEventOnUserErrors = true;
-            try
-            {
-                StringBuilder consulta = new();
-                SqlCommand Sqlcmd;
-                if (tipo_busqueda.Equals("CERRAR TURNO"))
-                {
-                    SqlCon.ConnectionString = this.IConexionDac.Cn();
-                    SqlCon.Open();
-                    Sqlcmd = new()
-                    {
-                        Connection = SqlCon,
-                        CommandText = "sp_Estadistica_cobradores_diarias",
-                        CommandType = CommandType.StoredProcedure
-                    };
-
-                    SqlParameter Fecha = new()
-                    {
-                        ParameterName = "@Fecha",
-                        SqlDbType = SqlDbType.VarChar,
-                        Size = 50,
-                        Value = textos_busqueda[0],
-                    };
-                    Sqlcmd.Parameters.Add(Fecha);
-                }
-                else if (tipo_busqueda.Equals("ABRIR TURNO"))
-                {
-                    SqlCon.ConnectionString = this.IConexionDac.Cn();
-                    SqlCon.Open();
-                    Sqlcmd = new()
-                    {
-                        Connection = SqlCon,
-                        CommandText = "sp_Abrir_turno_cobrador",
-                        CommandType = CommandType.StoredProcedure
-                    };
-
-                    SqlParameter Fecha = new()
-                    {
-                        ParameterName = "@Fecha",
-                        SqlDbType = SqlDbType.VarChar,
-                        Size = 50,
-                        Value = textos_busqueda[0],
-                    };
-                    Sqlcmd.Parameters.Add(Fecha);
-                }
-                else if (tipo_busqueda.Equals("CERRAR TURNO ANTERIOR"))
-                {
-                    SqlCon.ConnectionString = this.IConexionDac.Cn();
-                    SqlCon.Open();
-                    Sqlcmd = new()
-                    {
-                        Connection = SqlCon,
-                        CommandText = "sp_Cerrar_turnov2",
-                        CommandType = CommandType.StoredProcedure
-                    };
-
-                    SqlParameter Id_turno = new()
-                    {
-                        ParameterName = "@Id_turno",
-                        SqlDbType = SqlDbType.Int,
-                        Value = Convert.ToInt32(textos_busqueda[0]),
-                    };
-                    Sqlcmd.Parameters.Add(Id_turno);
-
-                    SqlParameter Id_cobro = new()
-                    {
-                        ParameterName = "@Id_cobro",
-                        SqlDbType = SqlDbType.Int,
-                        Value = Convert.ToInt32(textos_busqueda[1]),
-                    };
-                    Sqlcmd.Parameters.Add(Id_cobro);
-                }
-                else
-                {
-                    consulta.Append("SELECT * " +
-                        "FROM Turnos tu " +
-                        "INNER JOIN Usuarios us ON tu.Id_cobrador = us.Id_usuario " +
-                        "INNER JOIN Cobros co ON tu.Id_cobro = co.Id_cobro " +
-                        "INNER JOIN Tipo_productos tp ON co.Id_tipo_producto = tp.Id_tipo_producto " +
-                        "INNER JOIN Zonas zo ON co.Id_zona = zo.Id_zona " +
-                        "INNER JOIN Ciudades cd ON zo.Id_ciudad = cd.Id_ciudad ");
-
-                    if (tipo_busqueda.Equals("ID TURNO"))
-                    {
-                        consulta.Append($"WHERE tu.Id_turno = {textos_busqueda[0].Trim()} ");
-                    }
-                    else if (tipo_busqueda.Equals("ID COBRADOR"))
-                    {
-                        consulta.Append($"WHERE tu.Id_cobrador = {textos_busqueda[0].Trim()} ");
-                    }
-                    else if (tipo_busqueda.Equals("FECHA INICIO Y COBRO"))
-                    {
-                        consulta.Append($"WHERE tu.Fecha_inicio_turno = '{textos_busqueda[0].Trim()}' AND " +
-                            $"tu.Id_cobro = {textos_busqueda[1].Trim()} ");
-                    }
-
-                    consulta.Append("ORDER BY tu.Id_turno DESC");
-
-                    SqlCon.ConnectionString = this.IConexionDac.Cn();
-                    SqlCon.Open();
-                    Sqlcmd = new()
-                    {
-                        Connection = SqlCon,
-                        CommandText = consulta.ToString(),
-                        CommandType = CommandType.Text
-                    };
-                }
-
-                SqlDataAdapter SqlData = new(Sqlcmd);
-                SqlData.Fill(DtResultado);
-
-                if (DtResultado.Rows.Count < 1)
-                {
-                    DtResultado = null;
-                }
-            }
-            catch (SqlException ex)
-            {
-                rpta = ex.Message;
-                DtResultado = null;
-            }
-            catch (Exception ex)
-            {
-                rpta = ex.Message;
-                DtResultado = null;
-            }
-            finally
-            {
-                if (SqlCon.State == ConnectionState.Open)
-                    SqlCon.Close();
-            }
-            return Task.FromResult((DtResultado, rpta));
-        }
-        public Task<(DataTable dt, string rpta)> BuscarTurnos(string tipo_busqueda, string texto_busqueda)
+        public Task<(DataTable dt, string rpta)> BuscarTurnos(BusquedaBindingModel busqueda)
         {
             string rpta = "OK";
 
@@ -686,17 +547,25 @@
                 {
                     ParameterName = "@Tipo_busqueda",
                     SqlDbType = SqlDbType.VarChar,
-                    Value = tipo_busqueda
+                    Value = busqueda.Tipo_busqueda
                 };
                 Sqlcmd.Parameters.Add(Tipo_busqueda);
 
-                SqlParameter Texto_busqueda = new()
+                SqlParameter Texto_busqueda1 = new()
                 {
-                    ParameterName = "@Texto_busqueda",
+                    ParameterName = "@Texto_busqueda1",
                     SqlDbType = SqlDbType.VarChar,
-                    Value = texto_busqueda
+                    Value = busqueda.Texto_busqueda1
                 };
-                Sqlcmd.Parameters.Add(Texto_busqueda);
+                Sqlcmd.Parameters.Add(Texto_busqueda1);
+
+                SqlParameter Texto_busqueda2 = new()
+                {
+                    ParameterName = "@Texto_busqueda2",
+                    SqlDbType = SqlDbType.VarChar,
+                    Value = busqueda.Texto_busqueda2 ?? ""
+                };
+                Sqlcmd.Parameters.Add(Texto_busqueda2);
 
                 SqlDataAdapter SqlData = new(Sqlcmd);
                 SqlData.Fill(DtResultado);

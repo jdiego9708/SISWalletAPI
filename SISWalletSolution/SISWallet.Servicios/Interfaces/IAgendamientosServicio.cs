@@ -5,6 +5,7 @@ namespace SISWallet.Servicios.Interfaces
 {
     public interface IAgendamientosServicio
     {
+        RespuestaServicioModel ActualizarOrdenAgendamiento(List<BusquedaBindingModel> busqueda);
         RespuestaServicioModel SincronizarFilas(BusquedaBindingModel busqueda);
         RespuestaServicioModel AplazarCuota(PagarCuotaBindingModel cuota);
         RespuestaServicioModel PagarCuota(PagarCuotaBindingModel cuota);
