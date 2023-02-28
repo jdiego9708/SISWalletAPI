@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using SISWallet.Entidades.ModelosBindeo;
 using SISWallet.Entidades.ModelosBindeo.ModelosConfiguracion.ConfiguracionSISWallet;
+using SISWallet.Entidades.Models;
 using SISWallet.Servicios.Interfaces;
 
 namespace SISWallet.API.Controllers
@@ -197,6 +198,42 @@ namespace SISWallet.API.Controllers
             catch (Exception ex)
             {
                 logger.LogError("Error renovar venta", ex);
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("CerrarTurno")]
+        public IActionResult CerrarTurno(JObject turnoJson)
+        {
+            try
+            {
+                logger.LogInformation("Inicio de CerrarTurno");
+
+                Turnos turnoModel = turnoJson.ToObject<Turnos>();
+
+                if (turnoModel == null)
+                {
+                    logger.LogInformation("Sin información de turnoModel");
+                    throw new Exception("Sin información de turnoModel");
+                }
+                else
+                {
+                    RespuestaServicioModel rpta = this.IVentasServicio.CerrarTurnos(turnoModel);
+                    if (rpta.Correcto)
+                    {
+                        logger.LogInformation($"CerrarTurno correcta");
+                        return Ok(rpta.Respuesta);
+                    }
+                    else
+                    {
+                        return BadRequest(rpta.Respuesta);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("Error CerrarTurno", ex);
                 return BadRequest(ex.Message);
             }
         }

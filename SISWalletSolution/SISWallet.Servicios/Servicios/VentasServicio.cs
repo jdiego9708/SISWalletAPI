@@ -197,6 +197,27 @@ namespace SISWallet.Servicios.Servicios
                 return respuesta;
             }
         }
+        public RespuestaServicioModel CerrarTurnos(Turnos turno)
+        {
+            RespuestaServicioModel respuesta = new();
+            try
+            {
+                string rpta = this.ITurnosDac.CerrarTurno(turno).Result;
+
+                if (!rpta.Equals("OK"))
+                    throw new Exception(rpta);
+
+                respuesta.Correcto = true;
+                respuesta.Respuesta = JsonConvert.SerializeObject(turno);
+                return respuesta;
+            }
+            catch (Exception ex)
+            {
+                respuesta.Correcto = false;
+                respuesta.Respuesta = ex.Message;
+                return respuesta;
+            }
+        }
         public RespuestaServicioModel BuscarVentasDt(BusquedaBindingModel busqueda)
         {
             RespuestaServicioModel respuesta = new();

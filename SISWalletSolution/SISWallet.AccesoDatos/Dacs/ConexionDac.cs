@@ -8,7 +8,6 @@ namespace SISWallet.AccesoDatos.Dacs
     public class ConexionDac : IConexionDac
     {
         public IConfiguration Configuration { get; set; }
-        public ConfiguracionJWT ConfiguracionJWT { get; set; }
         public ConnectionStrings ConnectionStrings { get; set; }
         public ConfiguracionSISWallet ConfiguracionSISWallet { get; set; }
         public ConexionDac(IConfiguration Configuration)
@@ -20,9 +19,6 @@ namespace SISWallet.AccesoDatos.Dacs
 
             settings = this.Configuration.GetSection("ConfiguracionSISWallet");
             this.ConfiguracionSISWallet = settings.Get<ConfiguracionSISWallet>() ?? new ConfiguracionSISWallet();
-
-            settings = this.Configuration.GetSection("ConfiguracionJWT");
-            this.ConfiguracionJWT = settings.Get<ConfiguracionJWT>() ?? new ConfiguracionJWT();
         }
         public string Cn()
         {

@@ -200,5 +200,41 @@ namespace SISWallet.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost]
+        [Route("ReingresarCuota")]
+        public IActionResult ReingresarCuota(JObject agJson)
+        {
+            try
+            {
+                logger.LogInformation("Inicio de ReingresarCuota");
+
+                CuotaMalaBindingModel cuota = agJson.ToObject<CuotaMalaBindingModel>();
+
+                if (cuota == null)
+                {
+                    logger.LogInformation("Sin información de cuota");
+                    throw new Exception("Sin información de cuota");
+                }
+                else
+                {
+                    RespuestaServicioModel rpta = this.IAgendamientosServicio.ReingresarCuota(cuota);
+                    if (rpta.Correcto)
+                    {
+                        logger.LogInformation($"Busqueda correcta ReingresarCuota");
+                        return Ok(rpta.Respuesta);
+                    }
+                    else
+                    {
+                        return BadRequest(rpta.Respuesta);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("Error en actualizar ReingresarCuota", ex);
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

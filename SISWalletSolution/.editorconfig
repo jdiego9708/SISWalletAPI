@@ -15,3 +15,6 @@ dotnet_diagnostic.CS0649.severity = silent
 
 # CA1848: Usar los delegados LoggerMessage
 dotnet_diagnostic.CA1848.severity = silent
+
+# CS8601: Posible asignación de referencia nula
+dotnet_diagnostic.CS8601.severity = none

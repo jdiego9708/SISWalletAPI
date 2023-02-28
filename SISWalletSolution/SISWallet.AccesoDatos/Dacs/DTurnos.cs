@@ -729,5 +729,69 @@
             return Task.FromResult((DtResultado, rpta));
         }
         #endregion
+
+        #region METODO CERRAR TURNO
+        public Task<string>CerrarTurno(Turnos turno)
+        {
+            string rpta = string.Empty;
+
+           SqlConnection SqlCon = new();
+            SqlCon.InfoMessage += new SqlInfoMessageEventHandler(SqlCon_InfoMessage);
+            SqlCon.FireInfoMessageEventOnUserErrors = true;
+            try
+            {
+                SqlCon.ConnectionString = this.IConexionDac.Cn();
+                SqlCon.Open();
+                SqlCommand SqlCmd = new()
+                {
+                    Connection = SqlCon,
+                    CommandText = "sp_Cerrar_turnov2",
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                #region VARIABLES
+                SqlParameter Id_turno = new()
+                {
+                    ParameterName = "@Id_turno",
+                    SqlDbType = SqlDbType.Int,
+                    Value = turno.Id_turno
+                };
+                SqlCmd.Parameters.Add(Id_turno);
+
+                SqlParameter Id_cobro = new()
+                {
+                    ParameterName = "@Id_cobro",
+                    SqlDbType = SqlDbType.Int,
+                    Value = turno.Id_cobro
+                };
+                SqlCmd.Parameters.Add(Id_cobro);              
+                #endregion
+
+                rpta = SqlCmd.ExecuteNonQuery() >= 1 ? "OK" : "NO SE INGRESÓ";
+                if (!rpta.Equals("OK"))
+                {
+                    if (this.Mensaje_respuesta != null)
+                    {
+                        rpta = this.Mensaje_respuesta;
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                rpta = ex.Message;
+            }
+            catch (Exception ex)
+            {
+                rpta = ex.Message;
+            }
+            finally
+            {
+
+                if (SqlCon.State == ConnectionState.Open)
+                    SqlCon.Close();
+            }
+            return Task.FromResult(rpta);
+        }
+        #endregion
     }
 }

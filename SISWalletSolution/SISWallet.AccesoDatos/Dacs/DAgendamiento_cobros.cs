@@ -830,5 +830,58 @@
             return Task.FromResult(rpta);
         }
         #endregion
+
+        #region METODO REINGRESAR CUOTA
+        public Task<string> ReingresarCuota(int id_agendamiento)
+        {
+            string rpta = string.Empty;
+
+            SqlConnection SqlCon = new();
+            SqlCon.InfoMessage += new SqlInfoMessageEventHandler(SqlCon_InfoMessage);
+            SqlCon.FireInfoMessageEventOnUserErrors = true;
+            try
+            {
+                SqlCon.ConnectionString = this.IConexionDac.Cn();
+                SqlCon.Open();
+                SqlCommand SqlCmd = new()
+                {
+                    Connection = SqlCon,
+                    CommandText = "sp_ReingresarCuota",
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                SqlParameter Id_agendamiento = new()
+                {
+                    ParameterName = "@Id_agendamiento",
+                    SqlDbType = SqlDbType.Int,
+                    Value = id_agendamiento,
+                };
+                SqlCmd.Parameters.Add(Id_agendamiento);
+            
+                rpta = SqlCmd.ExecuteNonQuery() >= 1 ? "OK" : "NO SE INGRESÓ";
+                if (!rpta.Equals("OK"))
+                {
+                    if (this.Mensaje_respuesta != null)
+                    {
+                        rpta = this.Mensaje_respuesta;
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                rpta = ex.Message;
+            }
+            catch (Exception ex)
+            {
+                rpta = ex.Message;
+            }
+            finally
+            {
+                if (SqlCon.State == ConnectionState.Open)
+                    SqlCon.Close();
+            }
+            return Task.FromResult(rpta);
+        }
+        #endregion
     }
 }

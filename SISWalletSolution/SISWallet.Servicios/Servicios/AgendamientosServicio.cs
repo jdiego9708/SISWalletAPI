@@ -257,6 +257,40 @@ namespace SISWallet.Servicios.Servicios
                 return respuesta;
             }
         }
+        public RespuestaServicioModel ReingresarCuota(CuotaMalaBindingModel cuota)
+        {
+            RespuestaServicioModel respuesta = new();
+            try
+            {
+                string rpta =
+                    this.IAgendamiento_cobrosDac.ReingresarCuota(cuota.Id_agendamiento).Result;
+
+                if (rpta.Equals("OK"))
+                {
+                    respuesta.Correcto = true;
+                    respuesta.Respuesta = JsonConvert.SerializeObject(cuota);
+                }
+                else
+                {
+                    respuesta.Correcto = true;
+                    respuesta.Respuesta = JsonConvert.SerializeObject(new
+                    {
+                        MensajeError = $"Error reingresando la cuota | {rpta}"
+                    });
+                }
+
+                return respuesta;
+            }
+            catch (Exception ex)
+            {
+                respuesta.Correcto = false;
+                respuesta.Respuesta = JsonConvert.SerializeObject(new
+                {
+                    MensajeError = $"Error reingresando la cuota | {ex.Message}"
+                });
+                return respuesta;
+            }
+        }
         #endregion
     }
 }

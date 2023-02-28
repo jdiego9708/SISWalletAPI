@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using SISWallet.AccesoDatos;
 using SISWallet.AccesoDatos.Interfaces;
 using SISWallet.Entidades.Helpers;
@@ -11,12 +13,16 @@ using SISWallet.Servicios.Interfaces;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace SISWallet.Servicios.Servicios
 {
     public class UsuariosServicio : IUsuariosServicio
     {
         #region CONSTRUCTOR
+        public JwtModel JwtConfiguration { get; set; }
         public IUsuariosDac UsuariosDac { get; set; }
         public IDireccion_clientesDac Direccion_clientesDac { get; set; }
         public IVentasDac VentasDac { get; set; }
@@ -24,13 +30,16 @@ namespace SISWallet.Servicios.Servicios
         public IBlobStorageService IBlobStorageService { get; set; }
         public IRutas_archivosDac IRutas_archivosDac { get; set; }
         public ITurnosDac ITurnosDac { get; set; }
-        public UsuariosServicio(IUsuariosDac UsuariosDac,
+        public ISolicitudesDac ISolicitudesDac { get; set; }
+        public UsuariosServicio(IConfiguration IConfiguration,
+            IUsuariosDac UsuariosDac,
             IDireccion_clientesDac Direccion_clientesDac,
             IVentasDac VentasDac,
             IAgendamiento_cobrosDac Agendamiento_cobrosDac,
             IBlobStorageService IBlobStorageService,
             IRutas_archivosDac IRutas_archivosDac,
-            ITurnosDac ITurnosDac)
+            ITurnosDac ITurnosDac, 
+            ISolicitudesDac ISolicitudesDac)
         {
             this.UsuariosDac = UsuariosDac;
             this.Direccion_clientesDac = Direccion_clientesDac;
@@ -39,10 +48,33 @@ namespace SISWallet.Servicios.Servicios
             this.IBlobStorageService = IBlobStorageService;
             this.IRutas_archivosDac = IRutas_archivosDac;
             this.ITurnosDac = ITurnosDac;
+            this.ISolicitudesDac = ISolicitudesDac;
+
+            var settings = IConfiguration.GetSection("Jwt");
+            this.JwtConfiguration = settings.Get<JwtModel>();
         }
         #endregion
 
         #region MÉTODOS
+        private string GetTokenLogin(Usuarios user, DateTime dateExpired)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var llave = Encoding.UTF8.GetBytes(this.JwtConfiguration.Secreto);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(
+                        new Claim[]
+                        {
+                            new Claim(ClaimTypes.NameIdentifier, user.Id_usuario.ToString()),
+                            new Claim(ClaimTypes.Name, user.NombreCompleto),
+                        }
+                    ),
+                Expires = dateExpired,
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(llave), SecurityAlgorithms.HmacSha256)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
         public RespuestaServicioModel ProcesarLogin(LoginModel login)
         {
             RespuestaServicioModel respuesta = new();
@@ -119,15 +151,35 @@ namespace SISWallet.Servicios.Servicios
                 if (reglasUsuarios.Count < 1)
                     throw new Exception("No se encontraron las reglas del usuario");
 
+                var resultTipoSolicitudes = this.ISolicitudesDac.BuscarTipoSolicitudes(new()
+                {
+                    Tipo_busqueda = "COMPLETO",
+                    Texto_busqueda1 = string.Empty,
+                }).Result;
+
+                if (resultTipoSolicitudes.dt == null)
+                    throw new Exception("No se encontraron los tipos de solicitudes");
+
+                List<Tipo_solicitudes> tipossolicitudes = (from DataRow row in resultTipoSolicitudes.dt.Rows
+                                                           select new Tipo_solicitudes(row)).ToList();
+
+                if (tipossolicitudes == null)
+                    throw new Exception("No se encontraron los tipos de solicitudes");
+
+                DateTime fechaLogin = ConvertValueHelper.ConvertirFecha(login.Fecha);
+                TimeSpan horaLogin = ConvertValueHelper.ConvertirHora(login.Hora);
+
+                DateTime fechaCompleta = fechaLogin.Add(horaLogin);
+                DateTime fechaExpiredToken = fechaCompleta.AddHours(+12);
+
+                string token = this.GetTokenLogin(usuarioDefault, fechaExpiredToken);
+
                 //Buscar turno
                 var resultTurno = this.ITurnosDac.BuscarTurnos(new BusquedaBindingModel()
                 {
                     Tipo_busqueda = "ULTIMO TURNO ID COBRO",
                     Texto_busqueda1 = cobroDefault.Id_cobro.ToString()
                 }).Result;
-
-                DateTime fechaLogin = ConvertValueHelper.ConvertirFecha(login.Fecha);
-                TimeSpan horaLogin = ConvertValueHelper.ConvertirHora(login.Hora);
 
                 Turnos turno = null;
 
@@ -219,6 +271,8 @@ namespace SISWallet.Servicios.Servicios
                     PaisDefault = cobroDefault.Zona.Ciudad.Pais,
                     Reglas = reglas,
                     Usuarios_reglas = reglasUsuarios,
+                    TokenAccess = token,
+                    Tipo_solicitudes = tipossolicitudes,
                 };
 
                 if (loginData == null)

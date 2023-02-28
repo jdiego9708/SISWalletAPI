@@ -5,6 +5,7 @@ namespace SISWallet.AccesoDatos.Interfaces
 {
     public interface IAgendamiento_cobrosDac
     {
+        Task<string> ReingresarCuota(int id_agendamiento);
         Task<string> ActualizarOrden(int id_agendamiento, int orden);
         Task<string> InsertarAgendamiento(Agendamiento_cobros agendamiento);
         Task<string> CambiarEstadoAgendamiento(int id_agendamiento, string estado);
