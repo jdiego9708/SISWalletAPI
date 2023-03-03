@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
@@ -60,6 +61,7 @@ namespace SISWallet.API.Controllers
             }
         }
 
+        
         [HttpPost]
         [Route("NuevoCliente")]
         public IActionResult NuevoCliente(JObject clienteJson)
@@ -98,6 +100,7 @@ namespace SISWallet.API.Controllers
             }
         }
 
+        
         [HttpPost]
         [Route("BuscarArchivos")]
         public IActionResult BuscarArchivos(JObject busquedaJson)
@@ -136,6 +139,7 @@ namespace SISWallet.API.Controllers
             }
         }
 
+        
         [HttpPost]
         [Route("InsertarArchivos")]
         public IActionResult InsertarArchivos(JArray busquedaJson)
@@ -174,6 +178,7 @@ namespace SISWallet.API.Controllers
             }
         }
 
+        
         [HttpPost]
         [Route("SincronizarClientes")]
         public IActionResult SincronizarClientes(JObject busquedaJson)

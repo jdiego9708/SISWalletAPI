@@ -1,3 +1,4 @@
+using Azure.Storage.Blobs.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using SISWallet.AccesoDatos;
@@ -6,10 +7,13 @@ using SISWallet.AccesoDatos.Interfaces;
 using SISWallet.Entidades.Helpers;
 using SISWallet.Entidades.Helpers.Interfaces;
 using SISWallet.Entidades.ModelosBindeo.ModelosConfiguracion.ConfiguracionSISWallet;
+using SISWallet.Entidades.ModelosBindeo.ModelosConfiguracion.ConfiguracionTwilio;
 using SISWallet.Servicios.Interfaces;
 using SISWallet.Servicios.Servicios;
 using System.Reflection;
 using System.Text;
+using Twilio;
+using Twilio.Rest.Api.V2010.Account;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,7 +42,15 @@ var config = new ConfigurationBuilder()
 
 builder.Configuration.AddConfiguration(config);
 
-var settings = builder.Configuration.GetSection("Jwt");
+var settings = builder.Configuration.GetSection("TwilioConfiguration");
+TwilioConfiguration twilioConfiguration = settings.Get<TwilioConfiguration>();
+
+if (twilioConfiguration == null)
+    return;
+
+TwilioClient.Init(twilioConfiguration.AccountSID, twilioConfiguration.AuthToken);
+
+settings = builder.Configuration.GetSection("Jwt");
 JwtModel jwtSecurity = settings.Get<JwtModel>();
 
 if (jwtSecurity == null)
@@ -59,6 +71,7 @@ builder.Services.AddTransient<IConexionDac, ConexionDac>()
     .AddTransient<ICobrosDac, DCobros>()
     .AddTransient<IGastosDac, DGastos>()
     .AddTransient<IRutas_archivosDac, DRutas_archivos>()
+    .AddTransient<IReglasDac, DReglas>()
     .AddTransient<IDireccion_clientesDac, DDireccion_clientes>();
 
 #endregion
@@ -70,26 +83,39 @@ builder.Services.AddTransient<IVentasServicio, VentasServicio>();
 builder.Services.AddTransient<IBlobStorageService, BlobStorageService>();
 builder.Services.AddTransient<IGastosServicio, GastosServicio>();
 builder.Services.AddTransient<ICobrosServicio, CobrosServicio>();
+builder.Services.AddTransient<IReglasServicio, ReglasServicio>();
 builder.Services.AddTransient<ISolicitudesServicio, SolicitudesServicio>();
+builder.Services.AddTransient<IMensajesServicio, MensajesServicio>();
 #endregion
 
-builder.Services.AddHttpContextAccessor()
-                .AddAuthorization()
-                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                {
-                    options.RequireHttpsMetadata = false;
-                    options.SaveToken = true;
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = false,
-                        ValidateAudience = false,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = false,
-                        IssuerSigningKey = new SymmetricSecurityKey(llave),
-                        ClockSkew = TimeSpan.Zero
-                    };
-                });
+//builder.Services.AddHttpContextAccessor()
+//                .AddAuthorization()
+//                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//                .AddJwtBearer(options =>
+//                {
+//                    options.RequireHttpsMetadata = false;
+//                    options.SaveToken = true;
+//                    options.TokenValidationParameters = new TokenValidationParameters
+//                    {
+//                        ValidateIssuer = false,
+//                        ValidateAudience = false,
+//                        ValidateLifetime = true,
+//                        ValidateIssuerSigningKey = false,
+//                        IssuerSigningKey = new SymmetricSecurityKey(llave),
+//                        ClockSkew = TimeSpan.Zero
+//                    };
+//                });
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.Authority = "https://siswalletapi.azurewebsites.net"; // URL de la autoridad de autenticación
+    options.Audience = jwtSecurity.Audience; // Identificador de audiencia del API
+});
 
 builder.Services.AddCors();
 

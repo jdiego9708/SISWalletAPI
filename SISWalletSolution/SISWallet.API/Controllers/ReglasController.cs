@@ -13,40 +13,40 @@ namespace SISWallet.API.Controllers
     
     [Route("api/")]
     [ApiController]
-    public class GastosController : ControllerBase
+    public class ReglasController : ControllerBase
     {
-        private readonly ILogger<GastosController> logger;
-        private IGastosServicio IGastosServicio { get; set; }
-        public GastosController(ILogger<GastosController> logger,
-            IGastosServicio IGastosServicio)
+        private readonly ILogger<ReglasController> logger;
+        private IReglasServicio IReglasServicio { get; set; }
+        public ReglasController(ILogger<ReglasController> logger,
+            IReglasServicio IReglasServicio)
         {
             this.logger = logger;
-            this.IGastosServicio = IGastosServicio;
+            this.IReglasServicio = IReglasServicio;
         }
 
         [HttpPost]
-        [Route("InsertarGasto")]
-        public IActionResult InsertarGasto(JObject gastoJson)
+        [Route("InsertarRegla")]
+        public IActionResult InsertarRegla(JObject reglaJson)
         {
             try
             {
-                logger.LogInformation("Inicio de nuevo gasto");
+                logger.LogInformation("Inicio de nueva regla");
 
                 //loginJson = this.IEncriptacionHelper.ProcessJObject(loginJson);
 
-                Gastos gastoModel = gastoJson.ToObject<Gastos>();
+                Reglas reglaModel = reglaJson.ToObject<Reglas>();
 
-                if (gastoModel == null)
+                if (reglaModel == null)
                 {
-                    logger.LogInformation("Sin información de nuevo gasto");
-                    throw new Exception("Sin información de nuevo gasto");
+                    logger.LogInformation("Sin información de nueva regla");
+                    throw new Exception("Sin información de nueva regla");
                 }
                 else
                 {
-                    RespuestaServicioModel rpta = this.IGastosServicio.InsertarGasto(gastoModel);
+                    RespuestaServicioModel rpta = this.IReglasServicio.InsertarRegla(reglaModel);
                     if (rpta.Correcto)
                     {
-                        logger.LogInformation($"Nuevo gasto correcto Id gasto: {gastoModel.Id_gasto}");
+                        logger.LogInformation($"Nueva regla correcto Id regla: {reglaModel.Id_regla}");
                         return Ok(rpta.Respuesta);
                     }
                     else
@@ -57,18 +57,56 @@ namespace SISWallet.API.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError("Error nuevo gasto", ex);
+                logger.LogError("Error nueva regla", ex);
                 return BadRequest(ex.Message);
             }
         }
 
         [HttpPost]
-        [Route("BuscarGastos")]
-        public IActionResult BuscarGastos(JObject busquedaJson)
+        [Route("EditarRegla")]
+        public IActionResult EditarRegla(JObject reglaJson)
         {
             try
             {
-                logger.LogInformation("Inicio de buscar gastos");
+                logger.LogInformation("Inicio de editar regla");
+
+                //loginJson = this.IEncriptacionHelper.ProcessJObject(loginJson);
+
+                Reglas reglaModel = reglaJson.ToObject<Reglas>();
+
+                if (reglaModel == null)
+                {
+                    logger.LogInformation("Sin información de editar regla");
+                    throw new Exception("Sin información de editar regla");
+                }
+                else
+                {
+                    RespuestaServicioModel rpta = this.IReglasServicio.EditarRegla(reglaModel);
+                    if (rpta.Correcto)
+                    {
+                        logger.LogInformation($"editar regla correcto Id regla: {reglaModel.Id_regla}");
+                        return Ok(rpta.Respuesta);
+                    }
+                    else
+                    {
+                        return BadRequest(rpta.Respuesta);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("Error editar regla", ex);
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("BuscarReglas")]
+        public IActionResult BuscarReglas(JObject busquedaJson)
+        {
+            try
+            {
+                logger.LogInformation("Inicio de buscar reglas");
 
                 //loginJson = this.IEncriptacionHelper.ProcessJObject(loginJson);
 
@@ -76,15 +114,15 @@ namespace SISWallet.API.Controllers
 
                 if (busquedaModel == null)
                 {
-                    logger.LogInformation("Sin información de buscar gastos");
-                    throw new Exception("Sin información de buscar gastos");
+                    logger.LogInformation("Sin información de buscar reglas");
+                    throw new Exception("Sin información de buscar reglas");
                 }
                 else
                 {
-                    RespuestaServicioModel rpta = this.IGastosServicio.BuscarGastos(busquedaModel);
+                    RespuestaServicioModel rpta = this.IReglasServicio.BuscarReglas(busquedaModel);
                     if (rpta.Correcto)
                     {
-                        logger.LogInformation($"Buscar gastos correcto");
+                        logger.LogInformation($"Buscar reglas correcto");
                         return Ok(rpta.Respuesta);
                     }
                     else
@@ -95,45 +133,7 @@ namespace SISWallet.API.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError("Error buscar gastos", ex);
-                return BadRequest(ex.Message);
-            }
-        }
-
-        [HttpPost]
-        [Route("BuscarTipoGastos")]
-        public IActionResult BuscarTipoGastos(JObject busquedaJson)
-        {
-            try
-            {
-                logger.LogInformation("Inicio de buscar tipo gastos");
-
-                //loginJson = this.IEncriptacionHelper.ProcessJObject(loginJson);
-
-                BusquedaBindingModel busquedaModel = busquedaJson.ToObject<BusquedaBindingModel>();
-
-                if (busquedaModel == null)
-                {
-                    logger.LogInformation("Sin información de buscar tipo gastos");
-                    throw new Exception("Sin información de buscar tipo gastos");
-                }
-                else
-                {
-                    RespuestaServicioModel rpta = this.IGastosServicio.BuscarTipoGastos(busquedaModel);
-                    if (rpta.Correcto)
-                    {
-                        logger.LogInformation($"Buscar tipo gastos correcto");
-                        return Ok(rpta.Respuesta);
-                    }
-                    else
-                    {
-                        return BadRequest(rpta.Respuesta);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.LogError("Error buscar tipo gastos", ex);
+                logger.LogError("Error buscar reglas", ex);
                 return BadRequest(ex.Message);
             }
         }

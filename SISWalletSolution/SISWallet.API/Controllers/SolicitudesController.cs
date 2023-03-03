@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using SISWallet.Entidades.ModelosBindeo;
 using SISWallet.Entidades.ModelosBindeo.ModelosConfiguracion.ConfiguracionSISWallet;
@@ -7,6 +8,7 @@ using SISWallet.Servicios.Interfaces;
 
 namespace SISWallet.API.Controllers
 {
+    
     [Route("api/")]
     [ApiController]
     public class SolicitudesController : ControllerBase

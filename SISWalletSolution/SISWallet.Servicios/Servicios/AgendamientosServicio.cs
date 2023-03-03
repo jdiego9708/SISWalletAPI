@@ -30,7 +30,7 @@ namespace SISWallet.Servicios.Servicios
             {
                 string rpta = "OK";
 
-                foreach(BusquedaBindingModel busqueda in busquedas)
+                foreach (BusquedaBindingModel busqueda in busquedas)
                 {
                     if (string.IsNullOrEmpty(busqueda.Texto_busqueda1))
                         throw new Exception("El texto busqueda debe ser un id de agendamiento");
@@ -76,7 +76,7 @@ namespace SISWallet.Servicios.Servicios
             RespuestaServicioModel respuesta = new();
             try
             {
-                var result = this.IAgendamiento_cobrosDac.BuscarAgendamiento(busqueda.Tipo_busqueda, 
+                var result = this.IAgendamiento_cobrosDac.BuscarAgendamiento(busqueda.Tipo_busqueda,
                     busqueda.Textos_busqueda.ToArray()).Result;
 
                 string rpta = result.rpta;
@@ -108,7 +108,7 @@ namespace SISWallet.Servicios.Servicios
             RespuestaServicioModel respuesta = new();
             try
             {
-                string rpta = this.IAgendamiento_cobrosDac.TerminarAgendamiento(cuota.Id_agendamiento, 
+                string rpta = this.IAgendamiento_cobrosDac.TerminarAgendamiento(cuota.Id_agendamiento,
                     "TERMINADO", cuota.Valor_pagar, cuota.Saldo_restante).Result;
 
                 if (rpta.Equals("OK"))
@@ -116,7 +116,7 @@ namespace SISWallet.Servicios.Servicios
                     if (cuota.Saldo_restante <= 0)
                     {
                         rpta = this.IVentasDac.CambiarEstadoVenta(cuota.Id_venta, "TERMINADO").Result;
-                        if (!rpta.Equals("OK")) 
+                        if (!rpta.Equals("OK"))
                         {
                             respuesta.Correcto = true;
                             respuesta.Respuesta = JsonConvert.SerializeObject(new
@@ -125,31 +125,32 @@ namespace SISWallet.Servicios.Servicios
                             });
                         }
                     }
-
-                    rpta = this.IAgendamiento_cobrosDac.InsertarAgendamiento(cuota.AgendamientoNuevo).Result;
-
-                    if (!rpta.Equals("OK"))
+                    else
                     {
-                        respuesta.Correcto = true;
-                        respuesta.Respuesta = JsonConvert.SerializeObject(new
-                        {
-                            MensajeError = $"Error insertando el nuevo agendamiento | {rpta}"
-                        });
-                        return respuesta;
-                    }
+                        rpta = this.IAgendamiento_cobrosDac.InsertarAgendamiento(cuota.AgendamientoNuevo).Result;
 
+                        if (!rpta.Equals("OK"))
+                        {
+                            respuesta.Correcto = true;
+                            respuesta.Respuesta = JsonConvert.SerializeObject(new
+                            {
+                                MensajeError = $"Error insertando el nuevo agendamiento | {rpta}"
+                            });
+                            return respuesta;
+                        }
+                    }
                     respuesta.Correcto = true;
                     respuesta.Respuesta = JsonConvert.SerializeObject(cuota);
                 }
                 else
                 {
                     respuesta.Correcto = true;
-                    respuesta.Respuesta = JsonConvert.SerializeObject(new 
-                    { 
-                        MensajeError = $"Error pagando la cuota | {rpta}" 
+                    respuesta.Respuesta = JsonConvert.SerializeObject(new
+                    {
+                        MensajeError = $"Error pagando la cuota | {rpta}"
                     });
                 }
-                
+
                 return respuesta;
             }
             catch (Exception ex)
@@ -167,7 +168,7 @@ namespace SISWallet.Servicios.Servicios
             RespuestaServicioModel respuesta = new();
             try
             {
-                string rpta = 
+                string rpta =
                     this.IAgendamiento_cobrosDac.CambiarEstadoAgendamiento(cuota.Id_agendamiento,
                     "NO COBRADO").Result;
 
@@ -220,7 +221,7 @@ namespace SISWallet.Servicios.Servicios
                 if (dtAgendamientos == null)
                     throw new Exception("Error obteniendo el conteo filas");
 
-                foreach(DataRow row in dtAgendamientos.Rows)
+                foreach (DataRow row in dtAgendamientos.Rows)
                 {
                     int id_agendamiento = Convert.ToInt32(row["Id_agendamiento"]);
                     int orden = Convert.ToInt32(row["Orden"]);

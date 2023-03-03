@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
@@ -9,8 +10,9 @@ using SISWallet.Servicios.Interfaces;
 
 namespace SISWallet.API.Controllers
 {
-    [Route("api/")]
     [ApiController]
+    [Route("api/")]
+    [Authorize]
     public class VentasController : ControllerBase
     {
         private readonly ILogger<VentasController> logger;

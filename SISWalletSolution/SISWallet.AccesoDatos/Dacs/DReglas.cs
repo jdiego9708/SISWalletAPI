@@ -8,7 +8,7 @@
     using System.Threading.Tasks;
     using SISWallet.Entidades.ModelosBindeo;
 
-    public class DSolicitudes : ISolicitudesDac
+    public class DReglas : IReglasDac
     {
         #region MENSAJE
         private void SqlCon_InfoMessage(object sender, SqlInfoMessageEventArgs e)
@@ -35,14 +35,14 @@
 
         #region CONSTRUCTOR
         private readonly IConexionDac IConexionDac;
-        public DSolicitudes(IConexionDac iConexionDac)
+        public DReglas(IConexionDac iConexionDac)
         {
             IConexionDac = iConexionDac;
         }
         #endregion
 
         #region METODO INSERTAR
-        public Task<string> InsertarSolicitud(Solicitudes solicitud)
+        public Task<string> InsertarRegla(Reglas regla)
         {
             string rpta = string.Empty;
 
@@ -56,86 +56,69 @@
                 SqlCommand SqlCmd = new()
                 {
                     Connection = SqlCon,
-                    CommandText = "sp_Solicitudes_i",
+                    CommandText = "sp_Reglas_i",
                     CommandType = CommandType.StoredProcedure,
                 };
 
-                SqlParameter Id_solicitud = new()
+                SqlParameter Id_regla = new()
                 {
-                    ParameterName = "@Id_solicitud",
+                    ParameterName = "@Id_regla",
                     SqlDbType = SqlDbType.Int,
                     Direction = ParameterDirection.Output
                 };
-                SqlCmd.Parameters.Add(Id_solicitud);
+                SqlCmd.Parameters.Add(Id_regla);
 
-                SqlParameter Id_tipo_solicitud = new()
+                SqlParameter Id_cobro = new()
                 {
-                    ParameterName = "@Id_tipo_solicitud",
+                    ParameterName = "@Id_cobro",
                     SqlDbType = SqlDbType.Int,
-                    Value = solicitud.Id_tipo_solicitud
+                    Value = regla.Id_cobro
                 };
-                SqlCmd.Parameters.Add(Id_tipo_solicitud);
+                SqlCmd.Parameters.Add(Id_cobro);
 
-                SqlParameter Id_usuario = new ()
+                SqlParameter Nombre_regla = new()
                 {
-                    ParameterName = "@Id_usuario",
-                    SqlDbType = SqlDbType.Int,
-                    Value = solicitud.Id_usuario
-                };
-                SqlCmd.Parameters.Add(Id_usuario);
-
-                SqlParameter Parametro_solicitud = new()
-                {
-                    ParameterName = "@Parametro_solicitud",
+                    ParameterName = "@Nombre_regla",
                     SqlDbType = SqlDbType.VarChar,
                     Size = 50,
-                    Value = solicitud.Parametro_solicitud.Trim()
+                    Value = regla.Nombre_regla.Trim().ToUpper()
                 };
-                SqlCmd.Parameters.Add(Parametro_solicitud);
+                SqlCmd.Parameters.Add(Nombre_regla);
 
-                SqlParameter Fecha_solicitud = new ()
+                SqlParameter Descripcion_regla = new()
                 {
-                    ParameterName = "@Fecha_solicitud",
-                    SqlDbType = SqlDbType.Date,
-                    Value = solicitud.Fecha_solicitud,
-                };
-                SqlCmd.Parameters.Add(Fecha_solicitud);
-
-                SqlParameter Hora_solicitud = new ()
-                {
-                    ParameterName = "@Hora_solicitud",
-                    SqlDbType = SqlDbType.Time,
-                    Size = 2,
-                    Value = solicitud.Hora_solicitud,
-                };
-                SqlCmd.Parameters.Add(Hora_solicitud);
-
-                SqlParameter Asunto_solicitud = new ()
-                {
-                    ParameterName = "@Asunto_solicitud",
-                    SqlDbType = SqlDbType.VarChar,
-                    Size = 50,
-                    Value = solicitud.Asunto_solicitud.Trim()
-                };
-                SqlCmd.Parameters.Add(Asunto_solicitud);
-
-                SqlParameter Descripcion_solicitud = new()
-                {
-                    ParameterName = "@Descripcion_solicitud",
+                    ParameterName = "@Descripcion_regla",
                     SqlDbType = SqlDbType.VarChar,
                     Size = 500,
-                    Value = solicitud.Descripcion_solicitud.Trim()
+                    Value = regla.Descripcion_regla.Trim().ToUpper()
                 };
-                SqlCmd.Parameters.Add(Descripcion_solicitud);
+                SqlCmd.Parameters.Add(Descripcion_regla);
 
-                SqlParameter Estado_solicitud = new ()
+                SqlParameter Valor_regla = new()
                 {
-                    ParameterName = "@Estado_solicitud",
+                    ParameterName = "@Valor_regla",
+                    SqlDbType = SqlDbType.Decimal,
+                    Value = regla.Valor_regla
+                };
+                SqlCmd.Parameters.Add(Valor_regla);
+
+                SqlParameter Estado_regla = new()
+                {
+                    ParameterName = "@Estado_regla",
                     SqlDbType = SqlDbType.VarChar,
                     Size = 50,
-                    Value = solicitud.Estado_solicitud.Trim()
+                    Value = regla.Estado_regla.Trim().ToUpper()
                 };
-                SqlCmd.Parameters.Add(Estado_solicitud);
+                SqlCmd.Parameters.Add(Estado_regla);
+
+                SqlParameter Tipo_usuario_regla = new()
+                {
+                    ParameterName = "@Tipo_usuario_regla",
+                    SqlDbType = SqlDbType.VarChar,
+                    Size = 50,
+                    Value = regla.Tipo_usuario_regla.Trim().ToUpper()
+                };
+                SqlCmd.Parameters.Add(Tipo_usuario_regla);
 
                 rpta = SqlCmd.ExecuteNonQuery() >= 1 ? "OK" : "NO SE INGRESÓ";
                 if (!rpta.Equals("OK"))
@@ -146,7 +129,9 @@
                     }
                 }
                 else
-                    solicitud.Id_solicitud = Convert.ToInt32(SqlCmd.Parameters["@Id_solicitud"].Value);                
+                {
+                    regla.Id_regla = Convert.ToInt32(SqlCmd.Parameters["@Id_regla"].Value);
+                }
             }
             catch (SqlException ex)
             {
@@ -165,12 +150,117 @@
         }
         #endregion
 
-        #region METODO BUSCAR SOLICITUDES
-        public Task<(DataTable dt, string rpta)> BuscarSolicitudes(BusquedaBindingModel busqueda)
+        #region METODO EDITAR
+        public Task<string> EditarRegla(Reglas regla)
+        {
+            string rpta = string.Empty;
+
+            SqlConnection SqlCon = new();
+            SqlCon.InfoMessage += new SqlInfoMessageEventHandler(SqlCon_InfoMessage);
+            SqlCon.FireInfoMessageEventOnUserErrors = true;
+            try
+            {
+                SqlCon.ConnectionString = this.IConexionDac.Cn();
+                SqlCon.Open();
+                SqlCommand SqlCmd = new()
+                {
+                    Connection = SqlCon,
+                    CommandText = "sp_Reglas_u",
+                    CommandType = CommandType.StoredProcedure,
+                };
+
+                SqlParameter Id_regla = new()
+                {
+                    ParameterName = "@Id_regla",
+                    SqlDbType = SqlDbType.Int,
+                    Value = regla.Id_regla,
+                };
+                SqlCmd.Parameters.Add(Id_regla);
+
+                SqlParameter Id_cobro = new()
+                {
+                    ParameterName = "@Id_cobro",
+                    SqlDbType = SqlDbType.Int,
+                    Value = regla.Id_cobro
+                };
+                SqlCmd.Parameters.Add(Id_cobro);
+
+                SqlParameter Nombre_regla = new()
+                {
+                    ParameterName = "@Nombre_regla",
+                    SqlDbType = SqlDbType.VarChar,
+                    Size = 50,
+                    Value = regla.Nombre_regla.Trim().ToUpper()
+                };
+                SqlCmd.Parameters.Add(Nombre_regla);
+
+                SqlParameter Descripcion_regla = new()
+                {
+                    ParameterName = "@Descripcion_regla",
+                    SqlDbType = SqlDbType.VarChar,
+                    Size = 500,
+                    Value = regla.Descripcion_regla.Trim().ToUpper()
+                };
+                SqlCmd.Parameters.Add(Descripcion_regla);
+
+                SqlParameter Valor_regla = new()
+                {
+                    ParameterName = "@Valor_regla",
+                    SqlDbType = SqlDbType.Decimal,
+                    Value = regla.Valor_regla
+                };
+                SqlCmd.Parameters.Add(Valor_regla);
+
+                SqlParameter Estado_regla = new()
+                {
+                    ParameterName = "@Estado_regla",
+                    SqlDbType = SqlDbType.VarChar,
+                    Size = 50,
+                    Value = regla.Estado_regla.Trim().ToUpper()
+                };
+                SqlCmd.Parameters.Add(Estado_regla);
+
+                SqlParameter Tipo_usuario_regla = new()
+                {
+                    ParameterName = "@Tipo_usuario_regla",
+                    SqlDbType = SqlDbType.VarChar,
+                    Size = 50,
+                    Value = regla.Tipo_usuario_regla.Trim().ToUpper()
+                };
+                SqlCmd.Parameters.Add(Tipo_usuario_regla);
+
+                rpta = SqlCmd.ExecuteNonQuery() >= 1 ? "OK" : "NO SE INGRESÓ";
+                if (!rpta.Equals("OK"))
+                {
+                    if (this.Mensaje_respuesta != null)
+                    {
+                        rpta = this.Mensaje_respuesta;
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                rpta = ex.Message;
+            }
+            catch (Exception ex)
+            {
+                rpta = ex.Message;
+            }
+            finally
+            {
+                if (SqlCon.State == ConnectionState.Open)
+                    SqlCon.Close();
+            }
+            return Task.FromResult(rpta);
+        }
+        #endregion
+
+        #region METODO BUSCAR REGLAS
+        public Task<(DataTable dt, string rpta)> BuscarReglas(BusquedaBindingModel busqueda)
         {
             string rpta = "OK";
 
-            DataTable DtResultado = new("Solicitudes");
+            DataTable DtResultado = new("dtReglas");
             SqlConnection SqlCon = new();
             SqlCon.InfoMessage += new SqlInfoMessageEventHandler(SqlCon_InfoMessage);
             SqlCon.FireInfoMessageEventOnUserErrors = true;
@@ -181,7 +271,7 @@
                 SqlCommand Sqlcmd = new()
                 {
                     Connection = SqlCon,
-                    CommandText = "sp_Solicitudes_g",
+                    CommandText = "sp_Reglas_g",
                     CommandType = CommandType.StoredProcedure
                 };
 
@@ -211,64 +301,6 @@
                     Value = busqueda.Texto_busqueda2 ?? ""
                 };
                 Sqlcmd.Parameters.Add(Texto_busqueda2);
-
-                SqlDataAdapter SqlData = new(Sqlcmd);
-                SqlData.Fill(DtResultado);
-
-                if (DtResultado.Rows.Count < 1)
-                    DtResultado = null;               
-            }
-            catch (SqlException ex)
-            {
-                rpta = ex.Message;
-                DtResultado = null;
-            }
-            catch (Exception ex)
-            {
-                rpta = ex.Message;
-                DtResultado = null;
-            }
-            return Task.FromResult((DtResultado, rpta));
-        }
-        #endregion
-
-        #region METODO BUSCAR TIPO SOLICITUDES
-        public Task<(DataTable dt, string rpta)> BuscarTipoSolicitudes(BusquedaBindingModel busqueda)
-        {
-            string rpta = "OK";
-
-            DataTable DtResultado = new("TipoSolicitudes");
-            SqlConnection SqlCon = new();
-            SqlCon.InfoMessage += new SqlInfoMessageEventHandler(SqlCon_InfoMessage);
-            SqlCon.FireInfoMessageEventOnUserErrors = true;
-            try
-            {
-                SqlCon.ConnectionString = this.IConexionDac.Cn();
-                SqlCon.Open();
-                SqlCommand Sqlcmd = new()
-                {
-                    Connection = SqlCon,
-                    CommandText = "sp_Tipo_solicitudes_g",
-                    CommandType = CommandType.StoredProcedure
-                };
-
-                SqlParameter Tipo_busqueda = new()
-                {
-                    ParameterName = "@Tipo_busqueda",
-                    SqlDbType = SqlDbType.VarChar,
-                    Size = 50,
-                    Value = busqueda.Tipo_busqueda.Trim()
-                };
-                Sqlcmd.Parameters.Add(Tipo_busqueda);
-
-                SqlParameter Texto_busqueda = new()
-                {
-                    ParameterName = "@Texto_busqueda",
-                    SqlDbType = SqlDbType.VarChar,
-                    Size = 50,
-                    Value = busqueda.Texto_busqueda1.Trim()
-                };
-                Sqlcmd.Parameters.Add(Texto_busqueda);
 
                 SqlDataAdapter SqlData = new(Sqlcmd);
                 SqlData.Fill(DtResultado);

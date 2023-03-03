@@ -214,7 +214,7 @@
                     ParameterName = "@Texto_busqueda2",
                     SqlDbType = SqlDbType.VarChar,
                     Size = 50,
-                    Value = busqueda.Texto_busqueda2.Trim()
+                    Value = busqueda.Texto_busqueda2 ?? ""
                 };
                 Sqlcmd.Parameters.Add(Texto_busqueda2);
 

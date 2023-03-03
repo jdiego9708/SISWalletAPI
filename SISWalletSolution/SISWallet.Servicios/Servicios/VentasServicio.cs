@@ -122,7 +122,7 @@ namespace SISWallet.Servicios.Servicios
                 DataTable dtVentas = result.dtVentas;
 
                 if (dtVentas == null)
-                    throw new Exception($"Error obteniendo ventas | {rpta}");
+                    throw new Exception($"Sin resultados| {rpta}");
 
                 List<Ventas> ventas = (from DataRow row in dtVentas.Rows
                                        select new Ventas(row)).ToList();

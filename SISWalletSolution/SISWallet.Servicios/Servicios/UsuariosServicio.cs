@@ -38,7 +38,7 @@ namespace SISWallet.Servicios.Servicios
             IAgendamiento_cobrosDac Agendamiento_cobrosDac,
             IBlobStorageService IBlobStorageService,
             IRutas_archivosDac IRutas_archivosDac,
-            ITurnosDac ITurnosDac, 
+            ITurnosDac ITurnosDac,
             ISolicitudesDac ISolicitudesDac)
         {
             this.UsuariosDac = UsuariosDac;
@@ -56,25 +56,48 @@ namespace SISWallet.Servicios.Servicios
         #endregion
 
         #region MÉTODOS
-        private string GetTokenLogin(Usuarios user, DateTime dateExpired)
+        //private string GetTokenLogin(Usuarios user, DateTime dateExpired)
+        //{
+        //    var tokenHandler = new JwtSecurityTokenHandler();
+        //    var llave = Encoding.UTF8.GetBytes(this.JwtConfiguration.Secreto);
+        //    var tokenDescriptor = new SecurityTokenDescriptor
+        //    {
+        //        Subject = new ClaimsIdentity(
+        //                new Claim[]
+        //                {
+        //                    new Claim(ClaimTypes.NameIdentifier, user.Id_usuario.ToString()),
+        //                    new Claim(ClaimTypes.Name, user.NombreCompleto),
+        //                }
+        //            ),
+        //        Expires = dateExpired,
+        //        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(llave), SecurityAlgorithms.HmacSha256)
+        //    };
+        //    var token = tokenHandler.CreateToken(tokenDescriptor);
+        //    return tokenHandler.WriteToken(token);
+        //}
+        public string GenerateJwtToken(Usuarios user, int expireMinutes)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var llave = Encoding.UTF8.GetBytes(this.JwtConfiguration.Secreto);
-            var tokenDescriptor = new SecurityTokenDescriptor
+            var claims = new[]
             {
-                Subject = new ClaimsIdentity(
-                        new Claim[]
-                        {
-                            new Claim(ClaimTypes.NameIdentifier, user.Id_usuario.ToString()),
-                            new Claim(ClaimTypes.Name, user.NombreCompleto),
-                        }
-                    ),
-                Expires = dateExpired,
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(llave), SecurityAlgorithms.HmacSha256)
+                new Claim(ClaimTypes.Name, user.NombreCompleto),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Role, "Admin")
             };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.JwtConfiguration.Secreto));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: this.JwtConfiguration.Issuer,
+                audience: this.JwtConfiguration.Audience,
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(expireMinutes),
+                signingCredentials: creds
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
         public RespuestaServicioModel ProcesarLogin(LoginModel login)
         {
             RespuestaServicioModel respuesta = new();
@@ -170,9 +193,9 @@ namespace SISWallet.Servicios.Servicios
                 TimeSpan horaLogin = ConvertValueHelper.ConvertirHora(login.Hora);
 
                 DateTime fechaCompleta = fechaLogin.Add(horaLogin);
-                DateTime fechaExpiredToken = fechaCompleta.AddHours(+12);
+                DateTime fechaExpiredToken = fechaCompleta.AddDays(+1);
 
-                string token = this.GetTokenLogin(usuarioDefault, fechaExpiredToken);
+                string token = this.GenerateJwtToken(usuarioDefault, 120);
 
                 //Buscar turno
                 var resultTurno = this.ITurnosDac.BuscarTurnos(new BusquedaBindingModel()
