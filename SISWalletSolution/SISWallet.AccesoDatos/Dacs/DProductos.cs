@@ -85,14 +85,6 @@ namespace SISWallet.AccesoDatos.Dacs
                 };
                 SqlCmd.Parameters.Add(Nombre_producto);
 
-                SqlParameter Precio_producto = new()
-                {
-                    ParameterName = "@Precio_producto",
-                    SqlDbType = SqlDbType.Decimal,
-                    Value = producto.Precio_producto,
-                };
-                SqlCmd.Parameters.Add(Precio_producto);
-
                 SqlParameter Descripcion_producto = new()
                 {
                     ParameterName = "@Descripcion_producto",
@@ -203,14 +195,6 @@ namespace SISWallet.AccesoDatos.Dacs
                     Value = producto.Nombre_producto.Trim(),
                 };
                 SqlCmd.Parameters.Add(Nombre_producto);
-
-                SqlParameter Precio_producto = new()
-                {
-                    ParameterName = "@Precio_producto",
-                    SqlDbType = SqlDbType.Decimal,
-                    Value = producto.Precio_producto,
-                };
-                SqlCmd.Parameters.Add(Precio_producto);
 
                 SqlParameter Descripcion_producto = new()
                 {

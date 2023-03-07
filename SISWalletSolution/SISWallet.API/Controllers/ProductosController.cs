@@ -35,7 +35,7 @@ namespace SISWallet.API.Controllers
 
                 //loginJson = this.IEncriptacionHelper.ProcessJObject(loginJson);
 
-                Productos productoModel = productoson.ToObject<Productos>();
+                InsertarProductoBindingModel productoModel = productoson.ToObject<InsertarProductoBindingModel>();
 
                 if (productoModel == null)
                 {
@@ -47,7 +47,7 @@ namespace SISWallet.API.Controllers
                     RespuestaServicioModel rpta = this.IProductosServicio.InsertarProducto(productoModel);
                     if (rpta.Correcto)
                     {
-                        logger.LogInformation($"Nuevo producto correcto Id producto: {productoModel.Id_producto}");
+                        logger.LogInformation($"Nuevo producto correcto Id producto: {productoModel.Producto.Id_producto}");
                         return Ok(rpta.Respuesta);
                     }
                     else

@@ -6,7 +6,7 @@ namespace SISWallet.Servicios.Interfaces
 {
     public interface IProductosServicio
     {
-        RespuestaServicioModel InsertarProducto(Productos producto);
+        RespuestaServicioModel InsertarProducto(InsertarProductoBindingModel producto);
         RespuestaServicioModel BuscarProductos(BusquedaBindingModel busqueda);
     }
 }

@@ -80,7 +80,8 @@ builder.Services.AddTransient<IConexionDac, ConexionDac>()
     .AddTransient<IProveedoresDac, DProveedores>()
     .AddTransient<IStock_productosDac, DStock_productos>()
     .AddTransient<IPedidos_proveedorDac, DPedidos_proveedor>()
-    .AddTransient<IDetalle_pedidos_proveedorDac, DDetalle_pedidos_proveedor>();
+    .AddTransient<IDetalle_pedidos_proveedorDac, DDetalle_pedidos_proveedor>()
+    .AddTransient<IPrecios_productosDac, DPrecios_productos>();
 
 #endregion
 

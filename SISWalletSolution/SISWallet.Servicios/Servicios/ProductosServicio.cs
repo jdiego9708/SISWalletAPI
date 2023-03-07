@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using SISWallet.AccesoDatos.Dacs;
 using SISWallet.AccesoDatos.Interfaces;
 using SISWallet.Entidades.Helpers.Interfaces;
 using SISWallet.Entidades.Modelos;
@@ -13,72 +14,96 @@ namespace SISWallet.Servicios.Servicios
     {
         #region CONSTRUCTOR
         public IProductosDac IProductosDac { get; set; }
+        public IPrecios_productosDac IPrecios_productosDac { get; set; }
+        public IStock_productosDac IStock_productosDac { get; set; }
         public IRutas_archivosDac Rutas_archivosDac { get; set; }
         public IBlobStorageService BlobStorageService { get; set; }
-        public ProductosServicio(IProductosDac IProductosDac, 
+        public ProductosServicio(IProductosDac IProductosDac,
+            IPrecios_productosDac IPrecios_productosDac,
             IBlobStorageService BlobStorageService,
-            IRutas_archivosDac Rutas_archivosDac)
+            IRutas_archivosDac Rutas_archivosDac, 
+            IStock_productosDac IStock_productosDac)
         {
             this.IProductosDac = IProductosDac;
             this.BlobStorageService = BlobStorageService;
             this.Rutas_archivosDac = Rutas_archivosDac;
+            this.IPrecios_productosDac = IPrecios_productosDac;
+            this.IStock_productosDac = IStock_productosDac;
         }
         #endregion
 
         #region MÉTODOS
-        public RespuestaServicioModel InsertarProducto(Productos producto)
+        public Task GuardarImagenes(Productos producto)
+        {
+            if (producto.Imagenes != null)
+            {
+                if (producto.Imagenes.Count > 0)
+                {
+                    int contador = 1;
+                    foreach (string imagenbase64 in producto.Imagenes)
+                    {
+                        byte[] imagenByte = Convert.FromBase64String(imagenbase64);
+
+                        Stream stream = new MemoryStream(imagenByte);
+
+                        BlobResponse response = this.BlobStorageService.SubirArchivoContainerBlobStorage(stream,
+                            $"{producto.Id_producto}Imagen{contador}.png", "imagenesusuario");
+
+                        if (!response.IsSuccess)
+                            throw new Exception("Error guardando las imagenes en el blob");
+
+                        string uri = Convert.ToString(response.Message);
+
+                        if (string.IsNullOrEmpty(uri))
+                            throw new Exception("Error con la URL devuelta");
+
+                        DirectoryInfo info = new(uri);
+
+                        Rutas_archivos ruta = new()
+                        {
+                            Id_usuario = producto.Id_producto,
+                            Tipo_archivo = "IMAGEN PRODUCTO",
+                            Fecha_archivo = producto.Fecha_ingreso,
+                            Hora_archivo = producto.Fecha_ingreso.TimeOfDay,
+                            Nombre_archivo = Path.GetFileName(info.FullName),
+                            Ruta_archivo = uri,
+                            Extension_archivo = info.Extension,
+                        };
+
+                        string rpta = this.Rutas_archivosDac.InsertarRuta(ruta).Result;
+                        if (!rpta.Equals("OK"))
+                            throw new Exception("Error guardando las imágenes en la BD");
+
+                        contador++;
+                    }
+                }
+            }
+
+            return Task.CompletedTask;
+        }
+        public Task GuardarPreciosProducto(List<Precios_productos> precios)
+        {
+            precios.ForEach(producto => this.IPrecios_productosDac.InsertarPrecioProducto(producto));
+            return Task.CompletedTask;
+        }
+        public RespuestaServicioModel InsertarProducto(InsertarProductoBindingModel producto)
         {
             RespuestaServicioModel respuesta = new();
             try
             {
-                string rpta = this.IProductosDac.InsertarProducto(producto).Result;
+                string rpta = this.IProductosDac.InsertarProducto(producto.Producto).Result;
 
                 if (!rpta.Equals("OK"))
                     throw new Exception($"Hubo un error insertando el producto, detalles: {rpta}");
 
-                if (producto.Imagenes != null)
-                {
-                    if (producto.Imagenes.Count > 0)
-                    {
-                        int contador = 1;
-                        foreach (string imagenbase64 in producto.Imagenes)
-                        {
-                            byte[] imagenByte = Convert.FromBase64String(imagenbase64);
+                Task.Run(async () => await this.GuardarImagenes(producto.Producto));
 
-                            Stream stream = new MemoryStream(imagenByte);
+                Task.Run(async () => await this.GuardarPreciosProducto(producto.Precios_producto));
 
-                            BlobResponse response = this.BlobStorageService.SubirArchivoContainerBlobStorage(stream,
-                                $"{producto.Id_producto}Imagen{contador}.png", "imagenesusuario");
+                rpta = this.IStock_productosDac.InsertarStockProducto(producto.Stock_producto).Result;
 
-                            if (!response.IsSuccess)
-                                throw new Exception("Error guardando las imagenes en el blob");
-
-                            string uri = Convert.ToString(response.Message);
-
-                            if (string.IsNullOrEmpty(uri))
-                                throw new Exception("Error con la URL devuelta");
-
-                            DirectoryInfo info = new(uri);
-
-                            Rutas_archivos ruta = new()
-                            {
-                                Id_usuario = producto.Id_producto,
-                                Tipo_archivo = "IMAGEN PRODUCTO",
-                                Fecha_archivo = producto.Fecha_ingreso,
-                                Hora_archivo = producto.Fecha_ingreso.TimeOfDay,
-                                Nombre_archivo = Path.GetFileName(info.FullName),
-                                Ruta_archivo = uri,
-                                Extension_archivo = info.Extension,
-                            };
-
-                            rpta = this.Rutas_archivosDac.InsertarRuta(ruta).Result;
-                            if (!rpta.Equals("OK"))
-                                throw new Exception("Error guardando las imágenes en la BD");
-
-                            contador++;
-                        }
-                    }
-                }
+                if (!rpta.Equals("OK"))
+                    throw new Exception($"Hubo un error insertando el stock del producto, detalles: {rpta}");
 
                 respuesta.Correcto = true;
                 respuesta.Respuesta = JsonConvert.SerializeObject(producto);
