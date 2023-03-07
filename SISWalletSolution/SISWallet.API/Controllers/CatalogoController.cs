@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using SISWallet.Entidades.ModelosBindeo;
 using SISWallet.Entidades.ModelosBindeo.ModelosConfiguracion.ConfiguracionSISWallet;
-using SISWallet.Entidades.Models;
 using SISWallet.Servicios.Interfaces;
 
 namespace SISWallet.API.Controllers
@@ -13,24 +10,24 @@ namespace SISWallet.API.Controllers
     [Authorize]
     [Route("api/")]
     [ApiController]
-    public class CobrosController : ControllerBase
+    public class CatalogoController : ControllerBase
     {
-        private readonly ILogger<CobrosController> logger;
-        private ICobrosServicio ICobrosServicio { get; set; }
-        public CobrosController(ILogger<CobrosController> logger,
-            ICobrosServicio ICobrosServicio)
+        private readonly ILogger<CatalogoController> logger;
+        private ICatalogoServicio ICatalogoServicio { get; set; }
+        public CatalogoController(ILogger<CatalogoController> logger,
+            ICatalogoServicio ICatalogoServicio)
         {
             this.logger = logger;
-            this.ICobrosServicio = ICobrosServicio;
+            this.ICatalogoServicio = ICatalogoServicio;
         }
 
         [HttpPost]
-        [Route("BuscarCobros")]
-        public IActionResult BuscarCobros(JObject busquedaJson)
+        [Route("BuscarCatalogo")]
+        public IActionResult BuscarCatalogo(JObject busquedaJson)
         {
             try
             {
-                logger.LogInformation("Inicio de buscar cobros");
+                logger.LogInformation("Inicio de buscar catalogo");
 
                 //loginJson = this.IEncriptacionHelper.ProcessJObject(loginJson);
 
@@ -38,15 +35,15 @@ namespace SISWallet.API.Controllers
 
                 if (busquedaModel == null)
                 {
-                    logger.LogInformation("Sin información de buscar cobros");
-                    throw new Exception("Sin información de buscar cobros");
+                    logger.LogInformation("Sin información de buscar catalogo");
+                    throw new Exception("Sin información de buscar catalogo");
                 }
                 else
                 {
-                    RespuestaServicioModel rpta = this.ICobrosServicio.BuscarCobros(busquedaModel);
+                    RespuestaServicioModel rpta = this.ICatalogoServicio.BuscarCatalogo(busquedaModel);
                     if (rpta.Correcto)
                     {
-                        logger.LogInformation($"Buscar cobros correcto");
+                        logger.LogInformation($"Buscar catalogo correcto");
                         return Ok(rpta.Respuesta);
                     }
                     else
@@ -57,7 +54,7 @@ namespace SISWallet.API.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError("Error buscar cobros", ex);
+                logger.LogError("Error buscar catalogo", ex);
                 return BadRequest(ex.Message);
             }
         }

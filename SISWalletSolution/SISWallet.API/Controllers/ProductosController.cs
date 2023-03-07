@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using SISWallet.Entidades.Modelos;
 using SISWallet.Entidades.ModelosBindeo;
 using SISWallet.Entidades.ModelosBindeo.ModelosConfiguracion.ConfiguracionSISWallet;
 using SISWallet.Entidades.Models;
@@ -8,44 +11,43 @@ using SISWallet.Servicios.Interfaces;
 
 namespace SISWallet.API.Controllers
 {
-    
+    [Authorize]
     [Route("api/")]
     [ApiController]
-    public class SolicitudesController : ControllerBase
+    public class ProductosController : ControllerBase
     {
-        private readonly ILogger<SolicitudesController> logger;
-        private ISolicitudesServicio ISolicitudesServicio { get; set; }
-        public SolicitudesController(ILogger<SolicitudesController> logger,
-            ISolicitudesServicio ISolicitudesServicio)
+        private readonly ILogger<GastosController> logger;
+        private IProductosServicio IProductosServicio { get; set; }
+        public ProductosController(ILogger<GastosController> logger,
+            IProductosServicio IProductosServicio)
         {
             this.logger = logger;
-            this.ISolicitudesServicio = ISolicitudesServicio;
+            this.IProductosServicio = IProductosServicio;
         }
 
-        [Authorize]
         [HttpPost]
-        [Route("InsertarSolicitud")]
-        public IActionResult InsertarSolicitud(JObject solicitudJson)
+        [Route("InsertarProducto")]
+        public IActionResult InsertarProducto(JObject productoson)
         {
             try
             {
-                logger.LogInformation("Inicio de nuevo solicitud");
+                logger.LogInformation("Inicio de nuevo producto");
 
                 //loginJson = this.IEncriptacionHelper.ProcessJObject(loginJson);
 
-                Solicitudes solicitudModel = solicitudJson.ToObject<Solicitudes>();
+                Productos productoModel = productoson.ToObject<Productos>();
 
-                if (solicitudModel == null)
+                if (productoModel == null)
                 {
-                    logger.LogInformation("Sin información de nuevo solicitud");
-                    throw new Exception("Sin información de nuevo solicitud");
+                    logger.LogInformation("Sin información de nuevo producto");
+                    throw new Exception("Sin información de nuevo producto");
                 }
                 else
                 {
-                    RespuestaServicioModel rpta = this.ISolicitudesServicio.InsertarSolicitud(solicitudModel);
+                    RespuestaServicioModel rpta = this.IProductosServicio.InsertarProducto(productoModel);
                     if (rpta.Correcto)
                     {
-                        logger.LogInformation($"Nuevo solicitud correcto Id solicitud: {solicitudModel.Id_solicitud}");
+                        logger.LogInformation($"Nuevo producto correcto Id producto: {productoModel.Id_producto}");
                         return Ok(rpta.Respuesta);
                     }
                     else
@@ -56,19 +58,18 @@ namespace SISWallet.API.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError("Error nuevo solicitud", ex);
+                logger.LogError("Error nuevo producto", ex);
                 return BadRequest(ex.Message);
             }
         }
 
-        [Authorize]
         [HttpPost]
-        [Route("BuscarSolicitudes")]
-        public IActionResult BuscarSolicitudes(JObject busquedaJson)
+        [Route("BuscarProductos")]
+        public IActionResult BuscarProductos(JObject busquedaJson)
         {
             try
             {
-                logger.LogInformation("Inicio de buscar solicitudes");
+                logger.LogInformation("Inicio de buscar productos");
 
                 //loginJson = this.IEncriptacionHelper.ProcessJObject(loginJson);
 
@@ -76,15 +77,15 @@ namespace SISWallet.API.Controllers
 
                 if (busquedaModel == null)
                 {
-                    logger.LogInformation("Sin información de buscar solicitudes");
-                    throw new Exception("Sin información de buscar solicitudes");
+                    logger.LogInformation("Sin información de buscar productos");
+                    throw new Exception("Sin información de buscar productos");
                 }
                 else
                 {
-                    RespuestaServicioModel rpta = this.ISolicitudesServicio.BuscarSolicitudes(busquedaModel);
+                    RespuestaServicioModel rpta = this.IProductosServicio.BuscarProductos(busquedaModel);
                     if (rpta.Correcto)
                     {
-                        logger.LogInformation($"Buscar solicitudes correcto");
+                        logger.LogInformation($"Buscar productos correcto");
                         return Ok(rpta.Respuesta);
                     }
                     else
@@ -95,9 +96,10 @@ namespace SISWallet.API.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError("Error buscar solicitudes", ex);
+                logger.LogError("Error buscar productos", ex);
                 return BadRequest(ex.Message);
             }
         }
+
     }
 }

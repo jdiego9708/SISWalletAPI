@@ -13,7 +13,6 @@ using SISWallet.Servicios.Servicios;
 using System.Reflection;
 using System.Text;
 using Twilio;
-using Twilio.Rest.Api.V2010.Account;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -72,7 +71,16 @@ builder.Services.AddTransient<IConexionDac, ConexionDac>()
     .AddTransient<IGastosDac, DGastos>()
     .AddTransient<IRutas_archivosDac, DRutas_archivos>()
     .AddTransient<IReglasDac, DReglas>()
-    .AddTransient<IDireccion_clientesDac, DDireccion_clientes>();
+    .AddTransient<IDireccion_clientesDac, DDireccion_clientes>()
+    .AddTransient<ICatalogoDac, DCatalogo>()
+    .AddTransient<IPedidosDac, DPedidos>()
+    .AddTransient<IProductosDac, DProductos>()
+
+    .AddTransient<INovedadesDac, DNovedades>()
+    .AddTransient<IProveedoresDac, DProveedores>()
+    .AddTransient<IStock_productosDac, DStock_productos>()
+    .AddTransient<IPedidos_proveedorDac, DPedidos_proveedor>()
+    .AddTransient<IDetalle_pedidos_proveedorDac, DDetalle_pedidos_proveedor>();
 
 #endregion
 
@@ -86,36 +94,24 @@ builder.Services.AddTransient<ICobrosServicio, CobrosServicio>();
 builder.Services.AddTransient<IReglasServicio, ReglasServicio>();
 builder.Services.AddTransient<ISolicitudesServicio, SolicitudesServicio>();
 builder.Services.AddTransient<IMensajesServicio, MensajesServicio>();
+builder.Services.AddTransient<IProductosServicio, ProductosServicio>();
+builder.Services.AddTransient<ICatalogoServicio, CatalogoServicio>();
 #endregion
 
-//builder.Services.AddHttpContextAccessor()
-//                .AddAuthorization()
-//                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//                .AddJwtBearer(options =>
-//                {
-//                    options.RequireHttpsMetadata = false;
-//                    options.SaveToken = true;
-//                    options.TokenValidationParameters = new TokenValidationParameters
-//                    {
-//                        ValidateIssuer = false,
-//                        ValidateAudience = false,
-//                        ValidateLifetime = true,
-//                        ValidateIssuerSigningKey = false,
-//                        IssuerSigningKey = new SymmetricSecurityKey(llave),
-//                        ClockSkew = TimeSpan.Zero
-//                    };
-//                });
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.Authority = "https://siswalletapi.azurewebsites.net"; // URL de la autoridad de autenticación
-    options.Audience = jwtSecurity.Audience; // Identificador de audiencia del API
-});
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSecurity.Issuer,
+            ValidAudience = jwtSecurity.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecurity.Secreto))
+        };
+    });
 
 builder.Services.AddCors();
 
@@ -147,6 +143,8 @@ app.UseSwaggerUI();
 app.UseRouting();
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

@@ -10,7 +10,7 @@ using SISWallet.Servicios.Interfaces;
 
 namespace SISWallet.API.Controllers
 {
-    
+    [Authorize]
     [Route("api/")]
     [ApiController]
     public class GastosController : ControllerBase

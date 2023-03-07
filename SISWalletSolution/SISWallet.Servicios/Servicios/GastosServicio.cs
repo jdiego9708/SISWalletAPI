@@ -35,7 +35,6 @@ namespace SISWallet.Servicios.Servicios
             RespuestaServicioModel respuesta = new();
             try
             {
-                //Insertar Usuario
                 string rpta = this.GastosDac.InsertarGastos(gasto).Result;
                 if (!rpta.Equals("OK"))
                     throw new Exception($"Hubo un error insertando el gasto, detalles: {rpta}");

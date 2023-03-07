@@ -61,7 +61,8 @@ namespace SISWallet.API.Controllers
             }
         }
 
-        
+
+        [Authorize]
         [HttpPost]
         [Route("NuevoCliente")]
         public IActionResult NuevoCliente(JObject clienteJson)
@@ -100,7 +101,7 @@ namespace SISWallet.API.Controllers
             }
         }
 
-        
+        [Authorize]
         [HttpPost]
         [Route("BuscarArchivos")]
         public IActionResult BuscarArchivos(JObject busquedaJson)
@@ -139,7 +140,7 @@ namespace SISWallet.API.Controllers
             }
         }
 
-        
+        [Authorize]
         [HttpPost]
         [Route("InsertarArchivos")]
         public IActionResult InsertarArchivos(JArray busquedaJson)
@@ -178,7 +179,7 @@ namespace SISWallet.API.Controllers
             }
         }
 
-        
+        [Authorize]
         [HttpPost]
         [Route("SincronizarClientes")]
         public IActionResult SincronizarClientes(JObject busquedaJson)
