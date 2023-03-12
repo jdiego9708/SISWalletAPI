@@ -197,89 +197,125 @@ namespace SISWallet.Servicios.Servicios
 
                 string token = this.GenerateJwtToken(usuarioDefault, 120);
 
-                //Buscar turno
-                var resultTurno = this.ITurnosDac.BuscarTurnos(new BusquedaBindingModel()
-                {
-                    Tipo_busqueda = "ULTIMO TURNO ID COBRO",
-                    Texto_busqueda1 = cobroDefault.Id_cobro.ToString()
-                }).Result;
-
                 Turnos turno = null;
 
-                if (resultTurno.dt == null || resultTurno.dt.Rows.Count < 1)
+                if (usuarioDefault.Tipo_usuario.Equals("COBRADOR"))
                 {
-                    //Si entra por acá significa que es el primer turno del usuario
-                    turno = new()
+                    //Buscar turno
+                    var resultTurno = this.ITurnosDac.BuscarTurnos(new BusquedaBindingModel()
                     {
-                        Id_cobrador = usuarioDefault.Id_usuario,
-                        Id_cobro = cobroDefault.Id_cobro,
-                        Fecha_inicio_turno = fechaLogin,
-                        Fecha_fin_turno = fechaLogin,
-                        Hora_inicio_turno = horaLogin,
-                        Hora_fin_turno = horaLogin,
-                        Estado_turno = "ABIERTO",
-                    };
+                        Tipo_busqueda = "ULTIMO TURNO ID COBRO",
+                        Texto_busqueda1 = cobroDefault.Id_cobro.ToString()
+                    }).Result;
 
-                    string rptaturno = this.ITurnosDac.InsertarTurno(turno).Result;
-                    if (!rptaturno.Equals("OK"))
-                        throw new Exception("No se pudo insertar el turno inicial");
-                }
-                else
-                {
-                    //Comprobar la fecha
-                    turno = new(resultTurno.dt.Rows[0]);
-
-                    //urno.Cobrador 
-
-                    if (turno.Fecha_inicio_turno.ToString("yyyy-MM-dd") == login.Fecha)
+                    if (resultTurno.dt == null || resultTurno.dt.Rows.Count < 1)
                     {
-                        if (!usuarioDefault.Tipo_usuario.Equals("ADMINISTRADOR"))
-                            if (turno.Estado_turno.Equals("CERRADO"))
-                                throw new Exception("Turno cerrado no puede acceder a el");
+                        //Si entra por acá significa que es el primer turno del usuario
+                        turno = new()
+                        {
+                            Id_cobrador = usuarioDefault.Id_usuario,
+                            Id_cobro = cobroDefault.Id_cobro,
+                            Fecha_inicio_turno = fechaLogin,
+                            Fecha_fin_turno = fechaLogin,
+                            Hora_inicio_turno = horaLogin,
+                            Hora_fin_turno = horaLogin,
+                            Estado_turno = "ABIERTO",
+                        };
+
+                        string rptaturno = this.ITurnosDac.InsertarTurno(turno).Result;
+                        if (!rptaturno.Equals("OK"))
+                            throw new Exception("No se pudo insertar el turno inicial");
                     }
                     else
                     {
-                        if (!usuarioDefault.Tipo_usuario.Equals("ADMINISTRADOR"))
+                        //Comprobar la fecha
+                        turno = new(resultTurno.dt.Rows[0]);
+
+                        //urno.Cobrador 
+
+                        if (turno.Fecha_inicio_turno.ToString("yyyy-MM-dd") == login.Fecha)
                         {
-                            if (turno.Fecha_inicio_turno < fechaLogin)
+                            if (!usuarioDefault.Tipo_usuario.Equals("ADMINISTRADOR"))
+                                if (turno.Estado_turno.Equals("CERRADO"))
+                                    throw new Exception("Turno cerrado no puede acceder a el");
+                        }
+                        else
+                        {
+
+
+
+                            if (!usuarioDefault.Tipo_usuario.Equals("ADMINISTRADOR"))
                             {
-                                var resultSyncClientes = this.ITurnosDac.SincronizarClientes(cobroDefault.Id_cobro,
-                                usuarioDefault.Id_usuario, fechaLogin).Result;
-
-                                if (resultSyncClientes.dt == null)
-                                    throw new Exception("No se pudieron sincronizar los clientes");
-
-                                if (resultSyncClientes.dt.Rows.Count < 1)
-                                    throw new Exception("No se pudieron sincronizar los clientes");
-
-                                decimal valor_inicial = turno.Recaudo_real;
-                                //Si entra por acá significa que se debe crear el turno actual
-                                turno = new()
+                                if (turno.Fecha_inicio_turno < fechaLogin)
                                 {
-                                    Id_cobrador = usuarioDefault.Id_usuario,
-                                    Id_cobro = cobroDefault.Id_cobro,
-                                    Fecha_inicio_turno = fechaLogin,
-                                    Fecha_fin_turno = fechaLogin,
-                                    Hora_inicio_turno = login.Hora,
-                                    Hora_fin_turno = login.Hora,
-                                    Valor_inicial = valor_inicial,
-                                    Estado_turno = "ABIERTO",
-                                };
+                                    var resultSyncClientes = this.ITurnosDac.SincronizarClientes(cobroDefault.Id_cobro,
+                                    usuarioDefault.Id_usuario, fechaLogin).Result;
 
-                                string rptaturno = this.ITurnosDac.InsertarTurno(turno).Result;
-                                if (!rptaturno.Equals("OK"))
-                                    throw new Exception("No se pudo insertar el turno actual");
+                                    if (resultSyncClientes.dt == null)
+                                        throw new Exception("No se pudieron sincronizar los clientes");
 
-                                var resultEstadisticas = this.ITurnosDac.EstadisticasDiarias(turno.Id_turno,
-                                    turno.Fecha_inicio_turno).Result;
+                                    if (resultSyncClientes.dt.Rows.Count < 1)
+                                        throw new Exception("No se pudieron sincronizar los clientes");
 
-                                if (resultEstadisticas.dt == null)
-                                    throw new Exception("Error obteniendo las estadísticas del turno actual");
+                                    decimal valor_inicial = turno.Recaudo_real;
+                                    //Si entra por acá significa que se debe crear el turno actual
+                                    turno = new()
+                                    {
+                                        Id_cobrador = usuarioDefault.Id_usuario,
+                                        Id_cobro = cobroDefault.Id_cobro,
+                                        Fecha_inicio_turno = fechaLogin,
+                                        Fecha_fin_turno = fechaLogin,
+                                        Hora_inicio_turno = login.Hora,
+                                        Hora_fin_turno = login.Hora,
+                                        Valor_inicial = valor_inicial,
+                                        Estado_turno = "ABIERTO",
+                                    };
 
-                                turno = new Turnos(resultEstadisticas.dt.Rows[0]);
+                                    string rptaturno = this.ITurnosDac.InsertarTurno(turno).Result;
+                                    if (!rptaturno.Equals("OK"))
+                                        throw new Exception("No se pudo insertar el turno actual");
+
+                                    var resultEstadisticas = this.ITurnosDac.EstadisticasDiarias(turno.Id_turno,
+                                        turno.Fecha_inicio_turno).Result;
+
+                                    if (resultEstadisticas.dt == null)
+                                        throw new Exception("Error obteniendo las estadísticas del turno actual");
+
+                                    turno = new Turnos(resultEstadisticas.dt.Rows[0]);
+                                }
                             }
                         }
                     }
+                }
+                else
+                {
+                    //Buscar turno
+                    var resultTurno = this.ITurnosDac.BuscarTurnos(new BusquedaBindingModel()
+                    {
+                        Tipo_busqueda = "ULTIMO TURNO ID COBRO",
+                        Texto_busqueda1 = cobroDefault.Id_cobro.ToString()
+                    }).Result;
+
+                    if (resultTurno.dt == null || resultTurno.dt.Rows.Count < 1)
+                    {
+                        //Si entra por acá significa que es el primer turno del usuario
+                        turno = new()
+                        {
+                            Id_cobrador = usuarioDefault.Id_usuario,
+                            Id_cobro = cobroDefault.Id_cobro,
+                            Fecha_inicio_turno = fechaLogin,
+                            Fecha_fin_turno = fechaLogin,
+                            Hora_inicio_turno = horaLogin,
+                            Hora_fin_turno = horaLogin,
+                            Estado_turno = "ABIERTO",
+                        };
+
+                        string rptaturno = this.ITurnosDac.InsertarTurno(turno).Result;
+                        if (!rptaturno.Equals("OK"))
+                            throw new Exception("No se pudo insertar el turno inicial");
+                    }
+                    else
+                        turno = new(resultTurno.dt.Rows[0]);
                 }
 
                 LoginDataModel loginData = new()

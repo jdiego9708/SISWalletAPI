@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using SISWallet.Entidades.ModelosBindeo;
 using SISWallet.Entidades.ModelosBindeo.ModelosConfiguracion.ConfiguracionSISWallet;
 using SISWallet.Servicios.Interfaces;
+using Swashbuckle.AspNetCore;
 
 namespace SISWallet.API.Controllers
 {
