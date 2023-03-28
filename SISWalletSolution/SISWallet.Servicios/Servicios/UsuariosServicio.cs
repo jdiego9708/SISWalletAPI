@@ -31,6 +31,7 @@ namespace SISWallet.Servicios.Servicios
         public IRutas_archivosDac IRutas_archivosDac { get; set; }
         public ITurnosDac ITurnosDac { get; set; }
         public ISolicitudesDac ISolicitudesDac { get; set; }
+        public INotificationService INotificationService { get; set; }  
         public UsuariosServicio(IConfiguration IConfiguration,
             IUsuariosDac UsuariosDac,
             IDireccion_clientesDac Direccion_clientesDac,
@@ -39,7 +40,8 @@ namespace SISWallet.Servicios.Servicios
             IBlobStorageService IBlobStorageService,
             IRutas_archivosDac IRutas_archivosDac,
             ITurnosDac ITurnosDac,
-            ISolicitudesDac ISolicitudesDac)
+            ISolicitudesDac ISolicitudesDac,
+            INotificationService INotificationService)
         {
             this.UsuariosDac = UsuariosDac;
             this.Direccion_clientesDac = Direccion_clientesDac;
@@ -49,6 +51,7 @@ namespace SISWallet.Servicios.Servicios
             this.IRutas_archivosDac = IRutas_archivosDac;
             this.ITurnosDac = ITurnosDac;
             this.ISolicitudesDac = ISolicitudesDac;
+            this.INotificationService = INotificationService;
 
             var settings = IConfiguration.GetSection("Jwt");
             this.JwtConfiguration = settings.Get<JwtModel>();
@@ -196,6 +199,9 @@ namespace SISWallet.Servicios.Servicios
                 DateTime fechaExpiredToken = fechaCompleta.AddDays(+1);
 
                 string token = this.GenerateJwtToken(usuarioDefault, 120);
+
+                if (!string.IsNullOrEmpty(login.TokenFirebase))
+                    Task.Run(async () => await this.INotificationService.SendNotification(login.TokenFirebase));
 
                 Turnos turno = null;
 

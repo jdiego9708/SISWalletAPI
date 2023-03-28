@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using SISWallet.API.Hubs;
 using SISWallet.Entidades.Modelos;
 using SISWallet.Entidades.ModelosBindeo;
 using SISWallet.Entidades.ModelosBindeo.ModelosConfiguracion.ConfiguracionSISWallet;
@@ -16,20 +17,25 @@ namespace SISWallet.API.Controllers
     {
         private readonly ILogger<UsuariosController> logger;
         private IUsuariosServicio IUsuariosServicio { get; set; }
+        public INotificationService INotificationService { get; set; }
         public UsuariosController(ILogger<UsuariosController> logger,
-            IUsuariosServicio IUsuariosServicio)
+            IUsuariosServicio IUsuariosServicio,
+            INotificationService INotificationService)
         {
+            this.INotificationService = INotificationService;
             this.logger = logger;
             this.IUsuariosServicio = IUsuariosServicio;
         }
 
         [HttpPost]
         [Route("Login")]
-        public IActionResult Login(JObject loginJson)
+        public async Task<IActionResult> Login(JObject loginJson)
         {
             try
             {
                 logger.LogInformation("Inicio de Login");
+
+
 
                 //loginJson = this.IEncriptacionHelper.ProcessJObject(loginJson);
 
@@ -45,7 +51,8 @@ namespace SISWallet.API.Controllers
                     RespuestaServicioModel rpta = this.IUsuariosServicio.ProcesarLogin(loginModel);
                     if (rpta.Correcto)
                     {
-                        logger.LogInformation($"Login correcto {loginModel.Usuario}");
+
+                        logger.LogInformation($"Login correcto {loginModel.Clave}");
                         return Ok(rpta.Respuesta);
                     }
                     else
@@ -57,6 +64,43 @@ namespace SISWallet.API.Controllers
             catch (Exception ex)
             {
                 logger.LogError("Error iniciando sesión", ex);
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("BuscarRespuestaChatGPT")]
+        public async Task<IActionResult> BuscarRespuestaChatGPT(JObject busquedaJson)
+        {
+            try
+            {
+                logger.LogInformation("Inicio de BuscarRespuestaChatGPT");
+
+                BusquedaBindingModel busquedaModel = busquedaJson.ToObject<BusquedaBindingModel>();
+
+                if (busquedaModel == null)
+                {
+                    logger.LogInformation("Sin información de BuscarRespuestaChatGPT");
+                    throw new Exception("Sin información de BuscarRespuestaChatGPT");
+                }
+                else
+                {
+                    RespuestaServicioModel rpta = await this.INotificationService.BuscarRespuestaChatGPT(busquedaModel);
+                    if (rpta.Correcto)
+                    {
+
+                        logger.LogInformation($"BuscarRespuestaChatGPT correcto");
+                        return Ok(rpta.Respuesta);
+                    }
+                    else
+                    {
+                        return BadRequest(rpta.Respuesta);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("Error BuscarRespuestaChatGPT", ex);
                 return BadRequest(ex.Message);
             }
         }

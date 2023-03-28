@@ -11,6 +11,7 @@
     using System.Linq;
     using SISWallet.Entidades.ModelosBindeo;
     using SISWallet.Entidades.Helpers;
+    using SISWallet.Entidades.Modelos;
 
     public class DUsuarios : IUsuariosDac
     {
@@ -392,7 +393,7 @@
                 SqlData.Fill(DtResultado);
 
                 if (DtResultado.Rows.Count < 1)
-                    DtResultado = null;               
+                    DtResultado = null;
             }
             catch (SqlException ex)
             {
@@ -685,5 +686,157 @@
             }
             return Task.FromResult((rpta, loginData));
         }
+
+        #region METODO INSERTAR USUARIO FIREBASE
+        public Task<string> InsertarUsuarioFirebase(Usuarios_firebase usuario)
+        {
+            string rpta = string.Empty;
+
+            SqlConnection SqlCon = new();
+            SqlCon.InfoMessage += new SqlInfoMessageEventHandler(SqlCon_InfoMessage);
+            SqlCon.FireInfoMessageEventOnUserErrors = true;
+            try
+            {
+                SqlCon.ConnectionString = this.IConexionDac.Cn();
+                SqlCon.Open();
+                SqlCommand SqlCmd = new()
+                {
+                    Connection = SqlCon,
+                    CommandText = "sp_Usuarios_firebase_i",
+                    CommandType = CommandType.StoredProcedure,
+                };
+
+                #region VARIABLES
+                SqlParameter Id_token_firebase = new()
+                {
+                    ParameterName = "@Id_token_firebase",
+                    SqlDbType = SqlDbType.Int,
+                    Direction = ParameterDirection.Output
+                };
+                SqlCmd.Parameters.Add(Id_token_firebase);
+
+                SqlParameter Id_usuario = new()
+                {
+                    ParameterName = "@Id_usuario",
+                    SqlDbType = SqlDbType.Int,
+                    Value = usuario.Id_usuario,
+                };
+                SqlCmd.Parameters.Add(Id_usuario);
+
+                SqlParameter Fecha_firebase = new()
+                {
+                    ParameterName = "@Fecha_firebase",
+                    SqlDbType = SqlDbType.Date,
+                    Value = usuario.Fecha_firebase,
+                };
+                SqlCmd.Parameters.Add(Fecha_firebase);
+
+                SqlParameter Hora_firebase = new()
+                {
+                    ParameterName = "@Hora_firebase",
+                    SqlDbType = SqlDbType.Time,
+                    Value = usuario.Hora_firebase,
+                };
+                SqlCmd.Parameters.Add(Hora_firebase);
+
+                SqlParameter Token_firebase = new()
+                {
+                    ParameterName = "@Token_firebase",
+                    SqlDbType = SqlDbType.VarChar,
+                    Size = 1000,
+                    Value = usuario.Token_firebase,
+                };
+                SqlCmd.Parameters.Add(Token_firebase);
+              
+                #endregion
+
+                rpta = SqlCmd.ExecuteNonQuery() >= 1 ? "OK" : "NO SE INGRESÓ";
+
+                if (!rpta.Equals("OK"))
+                {
+                    if (this.Mensaje_respuesta != null)
+                    {
+                        rpta = this.Mensaje_respuesta;
+                    }
+                }
+                else
+                {
+                    usuario.Id_token_firebase = Convert.ToInt32(SqlCmd.Parameters["@Id_token_firebase"].Value);
+                }
+            }
+            catch (SqlException ex)
+            {
+                rpta = ex.Message;
+            }
+            catch (Exception ex)
+            {
+                rpta = ex.Message;
+            }
+            finally
+            {
+                if (SqlCon.State == ConnectionState.Open)
+                    SqlCon.Close();
+            }
+            return Task.FromResult(rpta);
+        }
+        #endregion
+
+        #region METODO BUSCAR USUARIOS FIREBASE
+        public Task<(DataTable dt, string rpta)> BuscarUsuariosFirebase(string tipo_busqueda, string texto_busqueda)
+        {
+            string rpta = "OK";
+
+            DataTable DtResultado = new("UsuariosFirebase");
+            SqlConnection SqlCon = new();
+            SqlCon.InfoMessage += new SqlInfoMessageEventHandler(SqlCon_InfoMessage);
+            SqlCon.FireInfoMessageEventOnUserErrors = true;
+            try
+            {
+                SqlCon.ConnectionString = this.IConexionDac.Cn();
+                SqlCon.Open();
+                SqlCommand Sqlcmd = new()
+                {
+                    Connection = SqlCon,
+                    CommandText = "sp_Usuarios_firebase_g",
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                SqlParameter Tipo_busqueda = new()
+                {
+                    ParameterName = "@Tipo_busqueda",
+                    SqlDbType = SqlDbType.VarChar,
+                    Size = 50,
+                    Value = tipo_busqueda.Trim()
+                };
+                Sqlcmd.Parameters.Add(Tipo_busqueda);
+
+                SqlParameter Texto_busqueda = new()
+                {
+                    ParameterName = "@Texto_busqueda",
+                    SqlDbType = SqlDbType.VarChar,
+                    Size = 50,
+                    Value = texto_busqueda.Trim()
+                };
+                Sqlcmd.Parameters.Add(Texto_busqueda);
+
+                SqlDataAdapter SqlData = new(Sqlcmd);
+                SqlData.Fill(DtResultado);
+
+                if (DtResultado.Rows.Count < 1)
+                    DtResultado = null;
+            }
+            catch (SqlException ex)
+            {
+                rpta = ex.Message;
+                DtResultado = null;
+            }
+            catch (Exception ex)
+            {
+                rpta = ex.Message;
+                DtResultado = null;
+            }
+            return Task.FromResult((DtResultado, rpta));
+        }
+        #endregion
     }
 }

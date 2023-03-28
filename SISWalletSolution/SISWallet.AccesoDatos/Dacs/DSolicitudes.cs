@@ -88,7 +88,6 @@
                 {
                     ParameterName = "@Parametro_solicitud",
                     SqlDbType = SqlDbType.VarChar,
-                    Size = 50,
                     Value = solicitud.Parametro_solicitud.Trim()
                 };
                 SqlCmd.Parameters.Add(Parametro_solicitud);

@@ -8,5 +8,6 @@ namespace SISWallet.Servicios.Interfaces
     {
         RespuestaServicioModel InsertarProducto(InsertarProductoBindingModel producto);
         RespuestaServicioModel BuscarProductos(BusquedaBindingModel busqueda);
+        RespuestaServicioModel BuscarProductosDt(BusquedaBindingModel busqueda);
     }
 }

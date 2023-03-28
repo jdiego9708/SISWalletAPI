@@ -143,6 +143,30 @@ namespace SISWallet.Servicios.Servicios
                 return respuesta;
             }
         }
+        public RespuestaServicioModel BuscarProductosDt(BusquedaBindingModel busqueda)
+        {
+            RespuestaServicioModel respuesta = new();
+            try
+            {
+                var (rpta, dt) = this.IProductosDac.BuscarProductos(busqueda).Result;
+
+                if (dt == null)
+                    throw new Exception("Error al buscar productos");
+
+                if (dt.Rows.Count < 1)
+                    throw new Exception("No se encontraron productos");
+
+                respuesta.Correcto = true;
+                respuesta.Respuesta = JsonConvert.SerializeObject(dt);
+                return respuesta;
+            }
+            catch (Exception ex)
+            {
+                respuesta.Correcto = false;
+                respuesta.Respuesta = ex.Message;
+                return respuesta;
+            }
+        }
         #endregion
     }
 }

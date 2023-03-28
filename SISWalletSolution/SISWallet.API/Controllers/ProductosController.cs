@@ -101,5 +101,43 @@ namespace SISWallet.API.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("BuscarProductosDt")]
+        public IActionResult BuscarProductosDt(JObject busquedaJson)
+        {
+            try
+            {
+                logger.LogInformation("Inicio de buscar productos dt");
+
+                //loginJson = this.IEncriptacionHelper.ProcessJObject(loginJson);
+
+                BusquedaBindingModel busquedaModel = busquedaJson.ToObject<BusquedaBindingModel>();
+
+                if (busquedaModel == null)
+                {
+                    logger.LogInformation("Sin información de buscar productos dt");
+                    throw new Exception("Sin información de buscar productos dt");
+                }
+                else
+                {
+                    RespuestaServicioModel rpta = this.IProductosServicio.BuscarProductosDt(busquedaModel);
+                    if (rpta.Correcto)
+                    {
+                        logger.LogInformation($"Buscar productos dt correcto");
+                        return Ok(rpta.Respuesta);
+                    }
+                    else
+                    {
+                        return BadRequest(rpta.Respuesta);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("Error buscar productos dt", ex);
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 }

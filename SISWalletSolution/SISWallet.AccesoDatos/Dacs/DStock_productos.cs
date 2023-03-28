@@ -56,7 +56,7 @@ namespace SISWallet.AccesoDatos.Dacs
                 SqlCommand SqlCmd = new()
                 {
                     Connection = SqlCon,
-                    CommandText = "sp_StockProductos_i",
+                    CommandText = "sp_Stock_productos_i",
                     CommandType = CommandType.StoredProcedure
                 };
 
@@ -76,13 +76,30 @@ namespace SISWallet.AccesoDatos.Dacs
                 };
                 SqlCmd.Parameters.Add(Id_producto);
 
-                SqlParameter Id_variante = new()
+                SqlParameter Tipos_producto = new()
                 {
-                    ParameterName = "@Id_variante",
-                    SqlDbType = SqlDbType.Int,
-                    Value = stockProducto.Id_variante,
+                    ParameterName = "@Tipos_producto",
+                    SqlDbType = SqlDbType.VarChar,
+                    Size = 2000,
+                    Value = stockProducto.Tipos_producto,
                 };
-                SqlCmd.Parameters.Add(Id_variante);
+                SqlCmd.Parameters.Add(Tipos_producto);
+
+                SqlParameter Fecha_stock = new()
+                {
+                    ParameterName = "@Fecha_stock",
+                    SqlDbType = SqlDbType.Date,
+                    Value = stockProducto.Fecha_stock,
+                };
+                SqlCmd.Parameters.Add(Fecha_stock);
+
+                SqlParameter Hora_stock = new()
+                {
+                    ParameterName = "@Hora_stock",
+                    SqlDbType = SqlDbType.Time,
+                    Value = stockProducto.Hora_stock,
+                };
+                SqlCmd.Parameters.Add(Hora_stock);
 
                 SqlParameter Unidad = new()
                 {
@@ -178,13 +195,30 @@ namespace SISWallet.AccesoDatos.Dacs
                 };
                 SqlCmd.Parameters.Add(Id_producto);
 
-                SqlParameter Id_variante = new()
+                SqlParameter Tipos_producto = new()
                 {
-                    ParameterName = "@Id_variante",
-                    SqlDbType = SqlDbType.Int,
-                    Value = stockProducto.Id_variante,
+                    ParameterName = "@Tipos_producto",
+                    SqlDbType = SqlDbType.VarChar,
+                    Size = 2000,
+                    Value = stockProducto.Tipos_producto,
                 };
-                SqlCmd.Parameters.Add(Id_variante);
+                SqlCmd.Parameters.Add(Tipos_producto);
+
+                SqlParameter Fecha_stock = new()
+                {
+                    ParameterName = "@Fecha_stock",
+                    SqlDbType = SqlDbType.Date,
+                    Value = stockProducto.Fecha_stock,
+                };
+                SqlCmd.Parameters.Add(Fecha_stock);
+
+                SqlParameter Hora_stock = new()
+                {
+                    ParameterName = "@Hora_stock",
+                    SqlDbType = SqlDbType.Time,
+                    Value = stockProducto.Hora_stock,
+                };
+                SqlCmd.Parameters.Add(Hora_stock);
 
                 SqlParameter Unidad = new()
                 {

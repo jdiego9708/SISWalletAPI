@@ -76,6 +76,14 @@ namespace SISWallet.AccesoDatos.Dacs
                 };
                 SqlCmd.Parameters.Add(Id_tipo_producto);
 
+                SqlParameter Id_cobro = new()
+                {
+                    ParameterName = "@Id_cobro",
+                    SqlDbType = SqlDbType.Int,
+                    Value = producto.Id_cobro,
+                };
+                SqlCmd.Parameters.Add(Id_cobro);
+
                 SqlParameter Nombre_producto = new()
                 {
                     ParameterName = "@Nombre_producto",
@@ -186,6 +194,14 @@ namespace SISWallet.AccesoDatos.Dacs
                     Value = producto.Id_tipo_producto,
                 };
                 SqlCmd.Parameters.Add(Id_tipo_producto);
+
+                SqlParameter Id_cobro = new()
+                {
+                    ParameterName = "@Id_cobro",
+                    SqlDbType = SqlDbType.Int,
+                    Value = producto.Id_cobro,
+                };
+                SqlCmd.Parameters.Add(Id_cobro);
 
                 SqlParameter Nombre_producto = new()
                 {
